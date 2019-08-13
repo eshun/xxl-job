@@ -16,5 +16,6 @@ import java.lang.annotation.Target;
 public @interface JobHandler {
 
     String value() default "";
-    
+
+    boolean cover() default false;
 }
