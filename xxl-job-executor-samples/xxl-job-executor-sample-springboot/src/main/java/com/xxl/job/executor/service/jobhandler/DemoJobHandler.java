@@ -1,11 +1,15 @@
 package com.xxl.job.executor.service.jobhandler;
 
 import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.Execute;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -23,6 +27,12 @@ import java.util.concurrent.TimeUnit;
 @JobHandler(value="demoJobHandler")
 @Component
 public class DemoJobHandler extends IJobHandler {
+
+	@Execute
+	public String[] test() {
+
+		return null;
+	}
 
 	@Override
 	public ReturnT<String> execute(String param) throws Exception {

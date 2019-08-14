@@ -1,5 +1,7 @@
 package com.xxl.job.core.biz.model;
 
+import com.xxl.job.core.handler.annotation.Param;
+
 import java.io.Serializable;
 
 /**
@@ -16,6 +18,7 @@ public class ReturnT<T> implements Serializable {
 	public static final ReturnT<String> SUCCESS = new ReturnT<String>(null);
 	public static final ReturnT<String> FAIL = new ReturnT<String>(FAIL_CODE, null);
 
+	@Param("code")
 	private int code;
 	private String msg;
 	private T content;

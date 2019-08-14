@@ -26,6 +26,16 @@ public class JobHandleParamInfo implements Serializable {
 
     private int ParamOrder;
 
+    private JobHandleParamInfo parent;
+
+    public JobHandleParamInfo getParent() {
+        return parent;
+    }
+
+    public void setParent(JobHandleParamInfo parent) {
+        this.parent = parent;
+    }
+
     public String getName() {
         return name;
     }
@@ -74,6 +84,7 @@ public class JobHandleParamInfo implements Serializable {
                 ", className='" + className + '\'' +
                 ", ParamType=" + ParamType +
                 ", ParamOrder=" + ParamOrder +
+                ", parent=" + parent +
                 '}';
     }
 }

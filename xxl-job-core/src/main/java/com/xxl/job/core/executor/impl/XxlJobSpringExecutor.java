@@ -8,20 +8,24 @@ import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.Execute;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.handler.annotation.Param;
+import com.xxl.job.core.util.GsonUtil;
 import com.xxl.job.core.util.ReflectionUtil;
+import jdk.nashorn.internal.runtime.Debug;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * xxl-job executor (for spring)
@@ -58,6 +62,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                 if (serviceBean instanceof IJobHandler){
                     String name = serviceBean.getClass().getAnnotation(JobHandler.class).value();
                     IJobHandler handler = (IJobHandler) serviceBean;
+                    initJobHandler(handler);
                     if (loadJobHandler(name) != null) {
                         throw new RuntimeException("xxl-job jobhandler naming conflicts.");
                     }
@@ -71,7 +76,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
      * 执行器类
      * @param jobHandler
      */
-    private void initJobHandler(IJobHandler jobHandler){
+    private void initJobHandler(IJobHandler jobHandler) {
         JobHandleInfo jobHandleInfo = new JobHandleInfo();
 
         Class<?> jobHandlerClass = jobHandler.getClass();
@@ -83,15 +88,10 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
         String className = jobHandlerClass.getName();
         String classShortName = ClassUtils.getShortName(className);
 
-        jobHandleInfo.setClassName(classShortName);
-        jobHandleInfo.setCover(cover);
-        jobHandleInfo.setName(name);
-        jobHandleInfo.setSerialVersionUID(serialVersionUID);
-
+        System.out.println("initJobHandler=>");
         // 执行器方法
         Method[] methods = jobHandlerClass.getDeclaredMethods();
-        if(methods!=null&&methods.length>0)
-        {
+        if (methods != null && methods.length > 0) {
             List<Method> methodsList = new ArrayList<>();
             for (Method method : methods) {
                 boolean hasExecute = method.isAnnotationPresent(Execute.class);
@@ -116,60 +116,108 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                 });
                 // 只取第一个
                 Method method = methodsList.get(0);
+
+                jobHandleInfo.setClassName(classShortName);
+                jobHandleInfo.setCover(cover);
+                jobHandleInfo.setName(name);
+                jobHandleInfo.setSerialVersionUID(serialVersionUID);
                 jobHandleInfo.setMethodName(method.getName());
+
+                //Class<?> returnType = method.getReturnType();
+                Execute executeAnnotation = method.getAnnotation(Execute.class);
+
+                Type returnType=method.getGenericReturnType();
+
+                System.out.println(returnType);
+
+                if(returnType != null) {
+                    List<JobHandleParamInfo> jobHandleParamInfos = executeReturn(returnType, null, executeAnnotation, null);
+
+                    jobHandleInfo.setJobHandleParamInfos(jobHandleParamInfos);
+                }
             }
         }
+        System.out.println(jobHandleInfo);
     }
 
     /**
      * 执行器参数
      * @param method
      */
-    private void parameterNameDiscoverer(Method method){
+    private void parameterNameDiscoverer(Method method) {
+        final Type[] genericParameterTypes = method.getGenericParameterTypes();
+        final Annotation[][] paramAnnotations = method.getParameterAnnotations();
 
     }
 
     /**
      * 执行器返回值
-     * @param method
+     * @param type
+     * @param execute
+     * @return
      */
-    private List<JobHandleParamInfo> executeReturn(Method method) {
-        List<JobHandleParamInfo> jobHandleParamInfos=new ArrayList<>();
-        Class<?> returnType = method.getReturnType();
-        String name=returnType.getName();
-        String classShortName = ClassUtils.getShortName(name);
+    private List<JobHandleParamInfo> executeReturn(Type type,JobHandleParamInfo parent, Execute execute,Field field) {
+        List<JobHandleParamInfo> jobHandleParamInfos = new ArrayList<>();
 
-        if (returnType == void.class || returnType == Void.class) {
+        Class<?> clazz = ParameterizedType.class.isAssignableFrom(type.getClass()) ?
+                ((ParameterizedTypeImpl) type).getRawType() : (Class<?>) type;
+        String clazzName = clazz.getName();
+        String name = ClassUtils.getShortName(clazzName);
+        if (field != null) {
+            name = field.getName();
+        }
+        JobHandleParamInfo jobHandleParamInfo = new JobHandleParamInfo();
+        jobHandleParamInfo.setParamType(1);
+        jobHandleParamInfo.setName(name);
+        jobHandleParamInfo.setClassName(clazzName);
+        jobHandleParamInfo.setParent(parent);
+        if (clazz.isArray()) {
+            jobHandleParamInfo.setName("Array");
+            jobHandleParamInfo.setClassName("Array");
+            jobHandleParamInfos.add(jobHandleParamInfo);
+            Class<?> newClass=clazz.getClasses()[0];
+            //clazz.get
+            jobHandleParamInfos.addAll(executeReturn(newClass, jobHandleParamInfo, null, null));
+        } else if (clazz == void.class || clazz == Void.class) {
             return null;
-        } else if (returnType.isPrimitive()) {
-            JobHandleParamInfo jobHandleParamInfo=new JobHandleParamInfo();
-            jobHandleParamInfo.setName(classShortName);
-            jobHandleParamInfo.setClassName(name);
-            Execute executeAnnotation = method.getAnnotation(Execute.class);
-            if(executeAnnotation!=null) {
-                Param param = executeAnnotation.param();
+        } else if (ReflectionUtil.isPrimitive(clazzName)) {
+            if (execute != null) {
+                Param param = execute.param();
                 jobHandleParamInfo.setValue(param.value());
             }
-            Param paramAnnotation=method.getAnnotation(Param.class);
-            if(paramAnnotation!=null) {
-                Param param = executeAnnotation.param();
-                jobHandleParamInfo.setValue(param.value());
+            if (field != null) {
+                Param paramAnnotation = field.getAnnotation(Param.class);
+                if (paramAnnotation != null) {
+                    jobHandleParamInfo.setValue(paramAnnotation.value());
+                }
             }
             jobHandleParamInfos.add(jobHandleParamInfo);
-        } else if (returnType.isArray()) {
-            Class<?>[] returnTypes=returnType.getClasses();
-
-
-        } else if (Collection.class.isAssignableFrom(returnType)) {
-
-        } else if (Map.class.isAssignableFrom(returnType)) {
-
-        } else{
-            Field[] fields = returnType.getDeclaredFields();
-            for (Field field : fields) {
-
+        }  else if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+            jobHandleParamInfos.add(jobHandleParamInfo);
+            if (type instanceof ParameterizedType) {
+                Type[] types = ((ParameterizedType) type).getActualTypeArguments();
+                for (Type newType : types) {
+                    jobHandleParamInfos.addAll(executeReturn(newType, jobHandleParamInfo, null, null));
+                }
+            }
+        } else {
+            jobHandleParamInfos.add(jobHandleParamInfo);
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field f : fields) {
+                Class<?> fieldClass = f.getType();
+                int modifiers = f.getModifiers();
+                Type genericType = f.getGenericType();
+                if (genericType == null || Modifier.isStatic(modifiers) || Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
+                    continue;
+                }
+                if (genericType.getTypeName().equals("T") && type instanceof ParameterizedType) {
+                    ParameterizedType parameterizedType = (ParameterizedType) type;
+                    fieldClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                }
+                jobHandleParamInfos.addAll(executeReturn(fieldClass, jobHandleParamInfo, null, f));
             }
         }
+        return jobHandleParamInfos;
     }
 
     // ---------------------- applicationContext ----------------------
