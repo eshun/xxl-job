@@ -29,8 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class DemoJobHandler extends IJobHandler {
 
 	@Execute
-	public String[][] test() {
-
+	public String test() {
 		return null;
 	}
 

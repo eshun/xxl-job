@@ -129,7 +129,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                 Type returnType=method.getGenericReturnType();
 
                 if(returnType != null) {
-                    JobHandleParamInfo jobHandleParamInfo = executeReturn(returnType, null, executeAnnotation, null);
+                    JobHandleParamInfo jobHandleParamInfo = executeReturn(returnType, executeAnnotation, null);
 
                     System.out.println(jobHandleParamInfo);
                     //jobHandleInfo.setJobHandleParamInfos(jobHandleParamInfos);
@@ -154,7 +154,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
      * @param execute
      * @return
      */
-    private JobHandleParamInfo executeReturn(Type type,JobHandleParamInfo parent, Execute execute,Field field) {
+    private JobHandleParamInfo executeReturn(Type type,Execute execute,Field field) {
 
         Class<?> clazz = ParameterizedType.class.isAssignableFrom(type.getClass()) ?
                 ((ParameterizedTypeImpl) type).getRawType() : (Class<?>) type;
@@ -172,7 +172,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
             jobHandleParamInfo.setClassName("Array");
 
             Class<?> newClass= clazz.getComponentType();
-            jobHandleParamInfo.addChildren(executeReturn(newClass, jobHandleParamInfo, null, null));
+            jobHandleParamInfo.addChildren(executeReturn(newClass, null, null));
         } else if (clazz == void.class || clazz == Void.class) {
             return null;
         } else if (ReflectionUtil.isPrimitive(clazzName)) {
@@ -190,7 +190,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
             if (type instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) type).getActualTypeArguments();
                 for (Type newType : types) {
-                    jobHandleParamInfo.addChildren(executeReturn(newType, jobHandleParamInfo, null, null));
+                    jobHandleParamInfo.addChildren(executeReturn(newType, null, null));
                 }
             }
         } else {
@@ -206,7 +206,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                     ParameterizedType parameterizedType = (ParameterizedType) type;
                     fieldClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
                 }
-                jobHandleParamInfo.addChildren(executeReturn(fieldClass, jobHandleParamInfo, null, f));
+                jobHandleParamInfo.addChildren(executeReturn(fieldClass, null, f));
             }
         }
         return jobHandleParamInfo;
