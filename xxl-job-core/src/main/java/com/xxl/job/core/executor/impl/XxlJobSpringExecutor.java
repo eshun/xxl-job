@@ -1,5 +1,6 @@
 package com.xxl.job.core.executor.impl;
 
+import com.google.gson.Gson;
 import com.xxl.job.core.biz.model.JobHandleInfo;
 import com.xxl.job.core.biz.model.JobHandleParamInfo;
 import com.xxl.job.core.executor.XxlJobExecutor;
@@ -125,9 +126,13 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
 
                 Execute executeAnnotation = method.getAnnotation(Execute.class);
 
-                //Class<?> returnType = method.getReturnType();
+                //Class<?> returnClass = method.getReturnType();
                 Type returnType=method.getGenericReturnType();
 
+                Gson gson = new Gson();
+                String json = gson.toJson(null,returnType);
+
+                System.out.println(json);
                 if(returnType != null) {
                     JobHandleParamInfo jobHandleParamInfo = executeReturn(returnType, executeAnnotation, null);
 
@@ -168,15 +173,15 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
         jobHandleParamInfo.setParamType(1);
         jobHandleParamInfo.setName(name);
         jobHandleParamInfo.setClassName(clazzName);
-        if (clazz.isArray()) {
+        if (clazz == null || clazz == void.class || clazz == Void.class) {
+            return null;
+        } else if (clazz.isArray()) {
             jobHandleParamInfo.setName("Array");
             jobHandleParamInfo.setClassName("Array");
 
-            Class<?> newClass= clazz.getComponentType();
+            Class<?> newClass = clazz.getComponentType();
             jobHandleParamInfo.addChildren(executeReturn(newClass, null, null));
-        } else if (clazz == void.class || clazz == Void.class) {
-            return null;
-        } else if (ReflectionUtil.isPrimitive(clazzName)) {
+        } else if (ReflectionUtil.isPrimitive(clazz)) {
             if (execute != null) {
                 Param param = execute.param();
                 jobHandleParamInfo.setValue(param.value());
@@ -187,7 +192,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                     jobHandleParamInfo.setValue(paramAnnotation.value());
                 }
             }
-        }  else if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+        } else if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
             if (type instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) type).getActualTypeArguments();
                 for (Type newType : types) {
@@ -196,13 +201,13 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
             }
         } else {
             Field[] fields = clazz.getDeclaredFields();
+            Map<String, Method> mapMethods = ReflectionUtil.getBeanPropertyReadMethods(clazz);
             for (Field f : fields) {
-                Class<?> fieldClass = f.getType();
-                int modifiers = f.getModifiers();
-                Type genericType = f.getGenericType();
-                if (genericType == null || Modifier.isStatic(modifiers) || Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
+                if (mapMethods.equals(f.getName())) {
                     continue;
                 }
+                Class<?> fieldClass = f.getType();
+                Type genericType = f.getGenericType();
                 if (genericType.getTypeName().equals("T") && type instanceof ParameterizedType) {
                     ParameterizedType parameterizedType = (ParameterizedType) type;
                     fieldClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];

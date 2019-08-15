@@ -12,5 +12,11 @@ import java.lang.annotation.*;
 @Inherited
 public @interface Param {
 
+    String name() default "";
+
     String value() default "";
+
+    boolean required() default false;
+
+    String defaultValue() default "";
 }
