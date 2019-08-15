@@ -1,5 +1,9 @@
 package com.xxl.job.core.util;
 
+import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 /**
  * TODO
  *
@@ -10,126 +14,113 @@ package com.xxl.job.core.util;
  */
 public class PojoToJsonUtil {
 
-    public static String getJsonString(Object obj) throws InstantiationException, IllegalAccessException
-    {
-  
-  //如果传入的对象为集合
-  if (obj instanceof Collection) {
-   
-   //执行collectionTojson方法将集合类型转为json格式
-   return collectionTojson(obj);
-   
-  }
-  
-  //如果获取的对象类型为一个Map集合
-  else if (obj instanceof Map) {
-   
-   //执行mapTojson方法将Map类型转为json格式
-   return mapTojson(obj);
-  
-  }
-  
-  //如果获取的对象类型为普通对象
-  else{
-   
-   //执行classTojson方法将普通类型转为json格式
-   return classTojson(obj);
-   
-  }  
- }
-   
-    /**
-   * @描述 将集合转为json格式的字符串
-   * @param obj
-   * @return
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   */
-    private static String collectionTojson(Object obj) throws IllegalArgumentException, IllegalAccessException {
-  
-  //定义一个StringBuffer类型的字符串
-  StringBuffer buffer = new StringBuffer();
-  buffer.append("[");
-  
-  Class<? extends Object> clazz = obj.getClass();
-  
-  //获取类中所有的字段
-  Field[] declaredFields = clazz.getDeclaredFields();
-  
-  //设置可以获得私有字段的value
-  Field.setAccessible(declaredFields, true);       
-  
-  //定义全局变量
-  boolean listf = false;
-  boolean setf = false;
-  Set<Object> set = null;
-  List<Object> list = null;
-  
-  //遍历获取到的所有字段
-  for (Field field : declaredFields) {
-   
-   //getDeclaringClass()同getClasses()，但不局限于public修饰，只要是目标类中声明的内部类和接口均可
-   
-   String simpleName = clazz.getSimpleName();
-   
-    //判断获取到的类型
-   if (simpleName.equals("ArrayList") || simpleName.equals("LinkedList")) {
-    list = (List<Object>) obj;
-    listf = true;
-   }
-   if (simpleName.equals("HashSet") || simpleName.equals("TreeSet")) {
-     set = (Set<Object>) obj;
-     setf = true;
-   }
-   
-  }
-  
-  
-  //如果获取的对象类型为一个List集合
-  if (listf == true) {
-   
-   return listTojson(buffer, list).toString();
-  
-  }
-  
-  //如果获取的对象类型为一个Set集合
-  if (setf == true) {
-   
-   buffer = setTojson(set, buffer);
-  
-  }
-  
-  buffer.append("]");
-  
-  return buffer.toString();
- }
- 
-         
-         /**
-   * 描述 将基本类转为json格式
-   * @param obj
-   * @return
-   */
-         
+    public static String getJsonString(Object obj) throws InstantiationException, IllegalAccessException {
 
+        //如果传入的对象为集合
+        if (obj instanceof Collection) {
+            //执行collectionTojson方法将集合类型转为json格式
+            return collectionTojson(obj);
+        }
+        //如果获取的对象类型为一个Map集合
+        else if (obj instanceof Map) {
+            //执行mapTojson方法将Map类型转为json格式
+            return mapTojson(obj);
+        }
+        //如果获取的对象类型为普通对象
+        else {
+            //执行classTojson方法将普通类型转为json格式
+            return classTojson(obj);
+        }
+    }
+
+    /**
+  * @描述 将集合转为json格式的字符串
+  * @param obj
+  * @return
+  * @throws IllegalArgumentException
+  * @throws IllegalAccessException
+  */
+    private static String collectionTojson(Object obj) throws IllegalArgumentException, IllegalAccessException {
+
+//定义一个StringBuffer类型的字符串
+StringBuffer buffer = new StringBuffer();
+buffer.append("[");
+
+Class<? extends Object> clazz = obj.getClass();
+
+//获取类中所有的字段
+Field[] declaredFields = clazz.getDeclaredFields();
+
+//设置可以获得私有字段的value
+Field.setAccessible(declaredFields, true);
+
+//定义全局变量
+boolean listf = false;
+boolean setf = false;
+Set<Object> set = null;
+List<Object> list = null;
+//遍历获取到的所有字段
+for (Field field : declaredFields) {
+    //getDeclaringClass()同getClasses()，但不局限于public修饰，只要是目标类中声明的内部类和接口均可
+
+    String simpleName = clazz.getSimpleName();
+
+    //判断获取到的类型
+    if (simpleName.equals("ArrayList") || simpleName.equals("LinkedList")) {
+        list = (List<Object>) obj;
+        listf = true;
+    }
+    if (simpleName.equals("HashSet") || simpleName.equals("TreeSet")) {
+        set = (Set<Object>) obj;
+        setf = true;
+    }
+}
+
+
+//如果获取的对象类型为一个List集合
+if (listf == true) {
+
+return listTojson(buffer, list).toString();
+
+}
+
+//如果获取的对象类型为一个Set集合
+if (setf == true) {
+
+buffer = setTojson(set, buffer);
+
+}
+
+buffer.append("]");
+
+return buffer.toString();
+
+}
+
+        
+        /**
+  * 描述 将基本类转为json格式
+  * @param obj
+  * @return
+  */
     private static String classTojson(Object obj) {
-  
-  //通过反射获取到类
-  Class<? extends Object> clazz = obj.getClass();
-  
-  //获取类中所有的字段
-  Field[] fields = clazz.getDeclaredFields();
-  
-  StringBuffer buffer = new StringBuffer();
-  buffer.append("[{");
-  
-  //设置setAccessible方法能获取到类中的私有属性和方法
-  Field.setAccessible(fields, true);
-  
-  //遍历所有的方法和属性
-  for (Field field : fields) {
-   
-   try {
+
+//通过反射获取到类
+        Class<? extends Object> clazz = obj.getClass();
+
+//获取类中所有的字段
+        Field[] fields = clazz.getDeclaredFields();
+
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("[{");
+
+//设置setAccessible方法能获取到类中的私有属性和方法
+        Field.setAccessible(fields, true);
+
+//遍历所有的方法和属性
+        for (Field field : fields) {
+
+            try {
     
     Object object = field.get(obj);
     
@@ -215,45 +206,43 @@ public class PojoToJsonUtil {
      }
     }
     
-   } catch (Exception e) {
+            } catch (Exception e) {
     // TODO Auto-generated catch block
     e.printStackTrace();
-   }
-  
-  }
-  buffer = new StringBuffer(buffer.substring(0, buffer.length() - 1));
-  buffer.append("}]");
-  
-  return buffer.toString();
- }
+            }
 
- /**
-   * 描述 将map集合转为json格式
-   * @param obj
-   * @return
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   */
-         
+        }
+        buffer = new StringBuffer(buffer.substring(0, buffer.length() - 1));
+        buffer.append("}]");
 
+        return buffer.toString();
+    }
+
+/**
+  * 描述 将map集合转为json格式
+  * @param obj
+  * @return
+  * @throws IllegalArgumentException
+  * @throws IllegalAccessException
+  */
     private static String mapTojson(Object obj) throws IllegalArgumentException, IllegalAccessException {
-  
-  StringBuffer buffer = new StringBuffer();
-  Class<? extends Object> clazz = obj.getClass();
-  Field[] declaredFields = clazz.getDeclaredFields();
-  Field.setAccessible(declaredFields, true);
-  buffer.append("[");
-  Map<Object, Object> map = (Map<Object, Object>) obj;
-  
-  //通过Map.entrySet使用iterator(迭代器)遍历key和value
-  Set<Entry<Object, Object>> set = map.entrySet(); 
-       Iterator iterator = set.iterator(); 
+
+        StringBuffer buffer = new StringBuffer();
+        Class<? extends Object> clazz = obj.getClass();
+        Field[] declaredFields = clazz.getDeclaredFields();
+        Field.setAccessible(declaredFields, true);
+        buffer.append("[");
+        Map<Object, Object> map = (Map<Object, Object>) obj;
+
+//通过Map.entrySet使用iterator(迭代器)遍历key和value
+        Set<Map.Entry<Object, Object>> set = map.entrySet();
+       Iterator iterator = set.iterator();
        buffer.append("{");
        
-       while (iterator.hasNext()) { 
-         
-         //使用Map.Entry接到通过迭代器循环出的set的值
-           Map.Entry mapentry = (Map.Entry) iterator.next(); 
+       while (iterator.hasNext()) {
+        
+        //使用Map.Entry接到通过迭代器循环出的set的值
+           Map.Entry mapentry = (Map.Entry) iterator.next();
            Object value = mapentry.getValue();
            
             //使用getKey()获取map的键，getValue()获取键对应的值
@@ -261,49 +250,40 @@ public class PojoToJsonUtil {
            if (valuename.equals("String")) {
     
     buffer.append("\"" + mapentry.getKey() + "\":\"" + mapentry.getValue() + "\",");
-   }
-   else
-            if (valuename.equals("Boolean") || valuename.equals("Integer") || valuename.equals("Double") || valuename.equals("Float") || valuename.equals("Long")) {
+            } else if (valuename.equals("Boolean") || valuename.equals("Integer") || valuename.equals("Double") || valuename.equals("Float") || valuename.equals("Long")) {
     
     buffer.append("\"" + mapentry.getKey() + "\":" + mapentry.getValue() + ",");
-   }
-   else if (valuename.equals("Date")) {
+            } else if (valuename.equals("Date")) {
     Date date = (Date) value;
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     String simdate = simpleDateFormat.format(date);
     buffer.append("\"" + mapentry.getKey() + "\":\"" + simdate + "\",");
-   } else if (valuename.equals("ArrayList") || valuename.equals("LinkedList"))
-   {
+            } else if (valuename.equals("ArrayList") || valuename.equals("LinkedList")) {
     List<Object> list = (List<Object>) value;
     buffer.append("\"" + mapentry.getKey() + "\":[");
     buffer = listTojson(buffer, list).append("]");
-   }
-   else if (valuename.equals("HashSet") || valuename.equals("TreeSet"))
-   {
+            } else if (valuename.equals("HashSet") || valuename.equals("TreeSet")) {
     buffer.append("\"" + mapentry.getKey() + "\":[");
     Set<Object> sets = (Set<Object>) value;
     buffer = setTojson(sets, buffer).append("]");
-   }
-   else if (valuename.equals("HashMap") || valuename.equals("HashTable"))
-   {
+            } else if (valuename.equals("HashMap") || valuename.equals("HashTable")) {
     buffer.append("\"" + mapentry.getKey() + "\":");
     StringBuffer mapbuffer = new StringBuffer(mapTojson(value));
     mapbuffer.deleteCharAt(0);
     buffer.append(mapbuffer);
-   }
-            else{
-             buffer.append("\"" + mapentry.getKey() + "\":");
-             buffer.append("{");
-             
-             Class<? extends Object> class1 = value.getClass();
-             Field[] fields = class1.getDeclaredFields();
-             Field.setAccessible(fields, true);
-             
-             for (Field field : fields) {
-              
-              Object object = field.get(value);
-              String fieldName = field.getType().getSimpleName();
-              
+            } else {
+           buffer.append("\"" + mapentry.getKey() + "\":");
+           buffer.append("{");
+            
+           Class<? extends Object> class1 = value.getClass();
+           Field[] fields = class1.getDeclaredFields();
+           Field.setAccessible(fields, true);
+            
+           for (Field field : fields) {
+            
+           Object object = field.get(value);
+           String fieldName = field.getType().getSimpleName();
+            
      if (object == null) {
       if (fieldName.equals("String"))
       {
@@ -314,12 +294,11 @@ public class PojoToJsonUtil {
        buffer.append("\"" + field.getName() + "\":null,");
       }
       
-     }
-              else{
-               
-               Class<? extends Object> fieldclass = field.get(value).getClass();
-               String simpleName = fieldclass.getSimpleName();
-               if (simpleName.equals("String")) {
+     } else {
+            
+           Class<? extends Object> fieldclass = field.get(value).getClass();
+            String simpleName = fieldclass.getSimpleName();
+            if (simpleName.equals("String")) {
        
        buffer.append("\"" + field.getName() + "\":\"" + field.get(value) + "\",");
       }
@@ -358,145 +337,145 @@ public class PojoToJsonUtil {
        buffer = beanTojson(object, buffer).append(",");
         
       }
-              }
+           }
      
     }
-             
-             buffer = new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
-             buffer.append("},");
+            
+           buffer = new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
+           buffer.append("},");
            }
-             
+            
          }
        
-        buffer = new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
-  return buffer.toString() + "}]";
- }
+        buffer = new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
+        return buffer.toString() + "}]";
+    }
 
- /**
-   * @描述 将不是基本类型的字段转为json格式
-   * @param obj
-   * @param buffer
-   * @return
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   */
-         
+/**
+  * @描述 将不是基本类型的字段转为json格式
+  * @param obj
+  * @param buffer
+  * @return
+  * @throws IllegalArgumentException
+  * @throws IllegalAccessException
+  */
+        
 
     private static StringBuffer beanTojson(Object obj, StringBuffer buffer) throws IllegalArgumentException, IllegalAccessException {
-  
-  Class<? extends Object> clazz = obj.getClass();
-  Field[] declaredFields = clazz.getDeclaredFields();
-  Field.setAccessible(declaredFields, true);
-  
-  buffer.append("\"" + clazz.getSimpleName() + "\":{");
-  
-  for (Field field : declaredFields) {
-   
-   Object object = field.get(obj);
-   String fieldName = field.getType().getSimpleName();
-   
-   if (object == null) {
+
+Class<? extends Object> clazz = obj.getClass();
+Field[] declaredFields = clazz.getDeclaredFields();
+Field.setAccessible(declaredFields, true);
+
+buffer.append("\"" + clazz.getSimpleName() + "\":{");
+
+for (Field field : declaredFields) {
+
+Object object = field.get(obj);
+String fieldName = field.getType().getSimpleName();
+
+if (object == null) {
     if (fieldName.equals("String"))
     {
      buffer.append("\"" + field.getName() + "\":\"\",");
     }
-   
+
     else{
      buffer.append("\"" + field.getName() + "\":null,");
     }
     
-   }
-   else{
+}
+else{
     
-   Class<? extends Object> fieldclass = object.getClass();
-   String simpleName = fieldclass.getSimpleName();
-   
-   if (simpleName.equals("String")) {
+Class<? extends Object> fieldclass = object.getClass();
+String simpleName = fieldclass.getSimpleName();
+
+if (simpleName.equals("String")) {
     
     buffer.append("\"" + field.getName() + "\":\"" + field.get(obj) + "\",");
-   }
-   else
+}
+else
                 if (simpleName.equals("Boolean") || simpleName.equals("Integer") || simpleName.equals("Double") || simpleName.equals("Float") || simpleName.equals("Long")) {
     
     buffer.append("\"" + field.getName() + "\":" + field.get(obj) + ",");
-   }
-   else if (simpleName.equals("Date")) {
+}
+else if (simpleName.equals("Date")) {
     
     Date date = (Date) object;
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     String simdate = simpleDateFormat.format(date);
     buffer.append("\"" + field.getName() + "\":\"" + simdate + "\",");
-   }
-   else if (simpleName.equals("ArrayList") || simpleName.equals("LinkedList")) {
+}
+else if (simpleName.equals("ArrayList") || simpleName.equals("LinkedList")) {
     
     List<Object> list = (List<Object>) object;
     buffer = listTojson(buffer, list);
-   }
-   else if (simpleName.equals("HashSet") || simpleName.equals("TreeSet")) {
+}
+else if (simpleName.equals("HashSet") || simpleName.equals("TreeSet")) {
     
     Set<Object> set = (Set<Object>) object;
     buffer = setTojson(set, buffer);
-   }
-   else if (simpleName.equals("HashMap") || simpleName.equals("HashTable")) {
+}
+else if (simpleName.equals("HashMap") || simpleName.equals("HashTable")) {
     
     buffer.append("\"" + field.getName() + "\":");
     StringBuffer mapbuffer = new StringBuffer(mapTojson(object));
     mapbuffer.deleteCharAt(0);
     buffer.append(mapbuffer);
-   }
-   else{
+}
+else{
      buffer = beanTojson(object, buffer).append("}");
     }
-   }
-   
-  }
-  
-  buffer = new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
-  buffer.append("}");
-  
-  return buffer;
- }
- 
-         /**
-   * @描述 将list数组转为json格式
-   * @param buffer
-   * @param list
-   * @return
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   */
-         
+}
+
+}
+
+buffer =new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
+buffer.append("}");
+
+return buffer;
+}
+
+        /**
+  * @描述 将list数组转为json格式
+  * @param buffer
+  * @param list
+  * @return
+  * @throws IllegalArgumentException
+  * @throws IllegalAccessException
+  */
+        
 
     private static StringBuffer listTojson(StringBuffer buffer, List list) throws IllegalArgumentException, IllegalAccessException {
-  
- //遍历传过来的list数组
- for (Object object : list) {
-   
-  //判断遍历出的值是否为空
-  if (object == null) {
-   buffer.append(","); 
-  }
-  else{
+
+//遍历传过来的list数组
+for (Object object : list) {
+
+//判断遍历出的值是否为空
+if (object == null) {
+buffer.append(",");
+}
+else{
     
-   Class<? extends Object> class1 = object.getClass();
-   String simpleName = class1.getSimpleName();
+Class<? extends Object> class1 = object.getClass();
+String simpleName = class1.getSimpleName();
     
-   if (simpleName.equals("String")) {
+if (simpleName.equals("String")) {
      
     buffer.append("\"" + object.toString() + "\",");
-   }
-   else
+}
+else
                 if (simpleName.equals("Boolean") || simpleName.equals("Integer") || simpleName.equals("Double") || simpleName.equals("Float") || simpleName.equals("Long")) {
      
     buffer.append("" + object.toString() + ",");
-   }
-   else if (simpleName.equals("Date")) {
+}
+else if (simpleName.equals("Date")) {
     Date date = (Date) object;
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     String simdate = simpleDateFormat.format(date);
     buffer.append("" + simdate + ",");
-   }
-   else{
+}
+else{
      
     Class<? extends Object> class2 = object.getClass();
     Field[] fields = class2.getDeclaredFields();
@@ -549,38 +528,38 @@ public class PojoToJsonUtil {
       
     }
      
-    buffer = new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
+    buffer =new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
     buffer.append("},");
-   }
-   }
-   
-  }
-  
-  buffer = new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
-  buffer.append("]");
-  
-  return buffer;
- }
- 
-         
-         
-         /**
-   * @描述 将set数组转为json格式
-   * @param set
-   * @param buffer
-   * @return
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   */
-         
+}
+}
+
+}
+
+buffer =new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
+buffer.append("]");
+
+return buffer;
+}
+
+        
+        
+        /**
+  * @描述 将set数组转为json格式
+  * @param set
+  * @param buffer
+  * @return
+  * @throws IllegalArgumentException
+  * @throws IllegalAccessException
+  */
+        
 
     private static StringBuffer setTojson(Set set, StringBuffer buffer) throws IllegalArgumentException, IllegalAccessException {
-  
-  for (Object object : set) {
-   if (object == null) {
-    buffer.append("" + "null" + ","); 
-   }
-   else{
+
+for (Object object : set) {
+if (object == null) {
+    buffer.append("" + "null" + ",");
+}
+else{
     
     Class<? extends Object> class1 = object.getClass();
     
@@ -649,16 +628,16 @@ public class PojoToJsonUtil {
         
         buffer = beanTojson(fieldobj, buffer).append(",");
        }
-      } 
+      }
      }
      
-     buffer = new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
+     buffer =new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
      buffer.append("},");
     }
-   }
-  }
-  
-  buffer = new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
-  return buffer;
- }
+}
+}
+
+buffer =new StringBuffer("" + buffer.substring(0, buffer.length() - 1) + "");
+return buffer;
+}
 }
