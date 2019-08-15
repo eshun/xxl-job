@@ -6,6 +6,7 @@ import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.Execute;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -30,6 +31,16 @@ public class DemoJobHandler extends IJobHandler {
 
 	@Execute
 	public String test() {
+		return null;
+	}
+
+	/**
+	 * Order越小越前
+	 * @return
+	 */
+	@Order
+	@Execute
+	public String stat() {
 		return null;
 	}
 

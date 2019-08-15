@@ -107,9 +107,9 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                     if (or1 == null && or2 == null) {
                         return 0;
                     } else if (or1 == null && or2 != null) {
-                        return -1;
-                    } else if (or1 != null && or2 == null) {
                         return 1;
+                    } else if (or1 != null && or2 == null) {
+                        return -1;
                     } else {
                         return Integer.compare(or1.value(), or2.value());
                     }
@@ -134,6 +134,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                     System.out.println(jobHandleParamInfo);
                     //jobHandleInfo.setJobHandleParamInfos(jobHandleParamInfos);
                 }
+                System.out.println(jobHandleInfo);
             }
         }
     }
