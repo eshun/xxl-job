@@ -1,6 +1,8 @@
 package com.xxl.job.core.biz.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO
@@ -26,14 +28,21 @@ public class JobHandleParamInfo implements Serializable {
 
     private int ParamOrder;
 
-    private JobHandleParamInfo parent;
+    private List<JobHandleParamInfo> children;
 
-    public JobHandleParamInfo getParent() {
-        return parent;
+    public List<JobHandleParamInfo> getChildren() {
+        return children;
     }
 
-    public void setParent(JobHandleParamInfo parent) {
-        this.parent = parent;
+    public void setChildren(List<JobHandleParamInfo> children) {
+        this.children = children;
+    }
+
+    public void addChildren(JobHandleParamInfo jobHandleParamInfo){
+        if(this.children==null){
+            this.children=new ArrayList<>();
+        }
+        this.children.add(jobHandleParamInfo);
     }
 
     public String getName() {
@@ -84,7 +93,7 @@ public class JobHandleParamInfo implements Serializable {
                 ", className='" + className + '\'' +
                 ", ParamType=" + ParamType +
                 ", ParamOrder=" + ParamOrder +
-                ", parent=" + parent +
+                ", children=" + children +
                 '}';
     }
 }

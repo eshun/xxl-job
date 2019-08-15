@@ -123,21 +123,19 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                 jobHandleInfo.setSerialVersionUID(serialVersionUID);
                 jobHandleInfo.setMethodName(method.getName());
 
-                //Class<?> returnType = method.getReturnType();
                 Execute executeAnnotation = method.getAnnotation(Execute.class);
 
+                //Class<?> returnType = method.getReturnType();
                 Type returnType=method.getGenericReturnType();
 
-                System.out.println(returnType);
-
                 if(returnType != null) {
-                    List<JobHandleParamInfo> jobHandleParamInfos = executeReturn(returnType, null, executeAnnotation, null);
+                    JobHandleParamInfo jobHandleParamInfo = executeReturn(returnType, null, executeAnnotation, null);
 
-                    jobHandleInfo.setJobHandleParamInfos(jobHandleParamInfos);
+                    System.out.println(jobHandleParamInfo);
+                    //jobHandleInfo.setJobHandleParamInfos(jobHandleParamInfos);
                 }
             }
         }
-        System.out.println(jobHandleInfo);
     }
 
     /**
@@ -156,8 +154,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
      * @param execute
      * @return
      */
-    private List<JobHandleParamInfo> executeReturn(Type type,JobHandleParamInfo parent, Execute execute,Field field) {
-        List<JobHandleParamInfo> jobHandleParamInfos = new ArrayList<>();
+    private JobHandleParamInfo executeReturn(Type type,JobHandleParamInfo parent, Execute execute,Field field) {
 
         Class<?> clazz = ParameterizedType.class.isAssignableFrom(type.getClass()) ?
                 ((ParameterizedTypeImpl) type).getRawType() : (Class<?>) type;
@@ -170,14 +167,12 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
         jobHandleParamInfo.setParamType(1);
         jobHandleParamInfo.setName(name);
         jobHandleParamInfo.setClassName(clazzName);
-        jobHandleParamInfo.setParent(parent);
         if (clazz.isArray()) {
             jobHandleParamInfo.setName("Array");
             jobHandleParamInfo.setClassName("Array");
-            jobHandleParamInfos.add(jobHandleParamInfo);
-            Class<?> newClass=clazz.getClasses()[0];
-            //clazz.get
-            jobHandleParamInfos.addAll(executeReturn(newClass, jobHandleParamInfo, null, null));
+
+            Class<?> newClass= clazz.getComponentType();
+            jobHandleParamInfo.addChildren(executeReturn(newClass, jobHandleParamInfo, null, null));
         } else if (clazz == void.class || clazz == Void.class) {
             return null;
         } else if (ReflectionUtil.isPrimitive(clazzName)) {
@@ -191,17 +186,14 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                     jobHandleParamInfo.setValue(paramAnnotation.value());
                 }
             }
-            jobHandleParamInfos.add(jobHandleParamInfo);
         }  else if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
-            jobHandleParamInfos.add(jobHandleParamInfo);
             if (type instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) type).getActualTypeArguments();
                 for (Type newType : types) {
-                    jobHandleParamInfos.addAll(executeReturn(newType, jobHandleParamInfo, null, null));
+                    jobHandleParamInfo.addChildren(executeReturn(newType, jobHandleParamInfo, null, null));
                 }
             }
         } else {
-            jobHandleParamInfos.add(jobHandleParamInfo);
             Field[] fields = clazz.getDeclaredFields();
             for (Field f : fields) {
                 Class<?> fieldClass = f.getType();
@@ -214,10 +206,10 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                     ParameterizedType parameterizedType = (ParameterizedType) type;
                     fieldClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
                 }
-                jobHandleParamInfos.addAll(executeReturn(fieldClass, jobHandleParamInfo, null, f));
+                jobHandleParamInfo.addChildren(executeReturn(fieldClass, jobHandleParamInfo, null, f));
             }
         }
-        return jobHandleParamInfos;
+        return jobHandleParamInfo;
     }
 
     // ---------------------- applicationContext ----------------------
