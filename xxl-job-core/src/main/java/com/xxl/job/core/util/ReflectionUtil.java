@@ -2,10 +2,7 @@ package com.xxl.job.core.util;
 
 import java.io.ObjectStreamClass;
 import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 
 /**
@@ -68,6 +65,13 @@ public class ReflectionUtil {
         return clazz == float.class || clazz == Float.class;
     }
 
+    public static boolean isShort(Class<?> clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        return clazz == short.class || clazz == Short.class;
+    }
+
     public static boolean isString(Class<?> clazz) {
         if (clazz == null) {
             return false;
@@ -83,15 +87,12 @@ public class ReflectionUtil {
     }
 
     public static boolean isPrimitive(Class<?> clazz) {
-        if (clazz == null) {
-            return false;
-        }
-        return clazz.isPrimitive() ||isBoolean(clazz)||isByte(clazz)|| isInteger(clazz)||isDouble(clazz)||
-                isLong(clazz)||isFloat(clazz)||isString(clazz)||isCharacter(clazz);
+        return clazz.isPrimitive() || isBoolean(clazz) || isString(clazz) || isCharacter(clazz) ||
+                Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz);
     }
 
     public static boolean isPojo(Class<?> clazz) {
-        return !isPrimitive(clazz)
+        return !isPrimitive(clazz) && !clazz.isInterface()
                 && !Collection.class.isAssignableFrom(clazz)
                 && !Map.class.isAssignableFrom(clazz);
     }
@@ -101,23 +102,31 @@ public class ReflectionUtil {
             return Character.MIN_VALUE;
         } else if (isBoolean(clazz)) {
             return false;
+        } else if (isShort(clazz)) {
+            return (short) 0;
+        } else if (isByte(clazz)) {
+            return (byte) 0;
+        } else if (isFloat(clazz)) {
+            return 0F;
+        } else if (isLong(clazz)) {
+            return 0L;
+        } else if (isDouble(clazz)) {
+            return 0D;
+        } else if (isString(clazz)) {
+            return "";
         } else {
             return clazz.isPrimitive() ? 0 : null;
         }
     }
 
-    public static int getArrayLenght(Class<?> clazz,int leg) {
+    public static Map<String, Object> getArrayClass(Class<?> clazz, int len) {
+        Map<String, Object> map = new HashMap<>(2);
         if (clazz.isArray()) {
-            return getArrayLenght(clazz.getComponentType(), leg + 1);
-        }
-        return leg;
-    }
-
-    public static Class getArrayClass(Class<?> clazz) {
-        if (clazz.isArray()) {
-            return getArrayClass(clazz.getComponentType());
+            return getArrayClass(clazz.getComponentType(), len + 1);
         } else {
-            return clazz;
+            map.put("clazz", clazz);
+            map.put("length", len);
+            return map;
         }
     }
 
@@ -206,6 +215,23 @@ public class ReflectionUtil {
         return properties;
     }
 
+    public static Method getBeanPublicSetterMethod(Class cl, String name, Class<?> valueCls) {
+        try {
+            String methodName = "set" + name.substring(0, 1).toUpperCase()
+                    + name.substring(1);
+            Method method = cl.getMethod(methodName, valueCls);
+            if (method != null
+                    && Modifier.isPublic(method.getModifiers())
+                    && !Modifier.isStatic(method.getModifiers())
+                    && method.getReturnType() == void.class) {
+                return method;
+            }
+        } catch (NoSuchMethodException e) {
+
+        }
+        return null;
+    }
+
     public static Type[] getReturnTypes(Method method) {
         Class<?> returnType = method.getReturnType();
         Type genericReturnType = method.getGenericReturnType();
@@ -225,5 +251,16 @@ public class ReflectionUtil {
             }
         }
         return new Type[]{returnType, genericReturnType};
+    }
+
+    public static Type getGenericClassByIndex(Type genericType, int index) {
+        Type clazz = null;
+        // find parameterized type
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType t = (ParameterizedType) genericType;
+            Type[] types = t.getActualTypeArguments();
+            clazz = types[index];
+        }
+        return clazz;
     }
 }

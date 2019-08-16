@@ -10,6 +10,7 @@ import com.xxl.job.core.handler.annotation.Execute;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.handler.annotation.Param;
 import com.xxl.job.core.util.GsonUtil;
+import com.xxl.job.core.util.PojoToJsonUtil;
 import com.xxl.job.core.util.ReflectionUtil;
 import jdk.nashorn.internal.runtime.Debug;
 import org.springframework.beans.BeansException;
@@ -127,16 +128,16 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                 Execute executeAnnotation = method.getAnnotation(Execute.class);
 
                 //Class<?> returnClass = method.getReturnType();
-                Type returnType=method.getGenericReturnType();
+                Type returnType = ReflectionUtil.getReturnTypes(method)[1];
 
-                Gson gson = new Gson();
-                String json = gson.toJson(null,returnType);
-
-                System.out.println(json);
-                if(returnType != null) {
+                if (returnType != null) {
                     JobHandleParamInfo jobHandleParamInfo = executeReturn(returnType, executeAnnotation, null);
 
                     System.out.println(jobHandleParamInfo);
+
+                    Object object = PojoToJsonUtil.pojoToJson(returnType, executeAnnotation, null);
+                    String json = GsonUtil.toJson(object);
+                    System.out.println(json);
                     //jobHandleInfo.setJobHandleParamInfos(jobHandleParamInfos);
                 }
                 System.out.println(jobHandleInfo);
@@ -203,7 +204,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
             Field[] fields = clazz.getDeclaredFields();
             Map<String, Method> mapMethods = ReflectionUtil.getBeanPropertyReadMethods(clazz);
             for (Field f : fields) {
-                if (mapMethods.equals(f.getName())) {
+                if (!mapMethods.containsKey(f.getName())) {
                     continue;
                 }
                 Class<?> fieldClass = f.getType();
