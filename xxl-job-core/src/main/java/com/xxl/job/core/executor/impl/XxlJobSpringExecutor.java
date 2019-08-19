@@ -16,6 +16,8 @@ import jdk.nashorn.internal.runtime.Debug;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.core.annotation.Order;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -132,13 +134,11 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
 
                 if (returnType != null) {
                     JobHandleParamInfo jobHandleParamInfo = executeReturn(returnType, executeAnnotation, null);
-
-                    System.out.println(jobHandleParamInfo);
+                    jobHandleInfo.setGenericReturn(jobHandleParamInfo);
 
                     Object object = PojoToJsonUtil.pojoToJson(returnType, executeAnnotation, null);
                     String json = GsonUtil.toJson(object);
-                    System.out.println(json);
-                    //jobHandleInfo.setJobHandleParamInfos(jobHandleParamInfos);
+                    jobHandleInfo.setReturnExample(json);
                 }
                 System.out.println(jobHandleInfo);
             }
@@ -150,9 +150,112 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
      * @param method
      */
     private void parameterNameDiscoverer(Method method) {
-        final Type[] genericParameterTypes = method.getGenericParameterTypes();
-        final Annotation[][] paramAnnotations = method.getParameterAnnotations();
+        List<JobHandleParamInfo> jobHandleParamInfos=new ArrayList<>();
+        ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
+        String[] paramNames = parameterNameDiscoverer.getParameterNames(method);
+        final Type[] types = method.getGenericParameterTypes();//getParameterTypes()
+        final Annotation[][] annotations = method.getParameterAnnotations();
+        int i=0;
+        for(Type t : types) {
+            Class<?> clazz = (Class<?>) t;
+            JobHandleParamInfo jobHandleParamInfo = new JobHandleParamInfo();
+            jobHandleParamInfo.setParamType(0);
+            jobHandleParamInfo.setName(paramNames[i]);
+            jobHandleParamInfo.setClassName(clazz.getName());
+            jobHandleParamInfo.setParamOrder(i);
+            Annotation[] paramAnnotations = annotations[i];
+            if (paramAnnotations.length > 0) {
+                Annotation annotation = paramAnnotations[0];
+                if (annotation != null) {
+                    if (annotation.annotationType().equals(Param.class)) {
+                        try {
+                            jobHandleParamInfo.setValue(((Param) annotation).value());
+                        } catch (Exception e) {
 
+                        }
+                    }
+                }
+            }
+            if (clazz.isArray()) {
+                jobHandleParamInfo.setClassName("Array");
+                Class<?> newClass = clazz.getComponentType();
+                jobHandleParamInfo.addChildren(getParamInfo(newClass,null));
+            } else if (ReflectionUtil.isPrimitive(clazz)) {
+
+            }else if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+                if (t instanceof ParameterizedType) {
+                    Type[] parameterizedTypes = ((ParameterizedType) t).getActualTypeArguments();
+                    for (Type newType : parameterizedTypes) {
+                        jobHandleParamInfo.addChildren(getParamInfo(newType, null));
+                    }
+                }
+            } else {
+                Field[] fields = clazz.getDeclaredFields();
+                Map<String, Method> mapMethods = ReflectionUtil.getBeanPropertyReadMethods(clazz);
+                for (Field f : fields) {
+                    if (!mapMethods.containsKey(f.getName())) {
+                        continue;
+                    }
+                    Class<?> fieldClass = f.getType();
+                    Type genericType = f.getGenericType();
+                    if (genericType.getTypeName().equals("T") && t instanceof ParameterizedType) {
+                        ParameterizedType parameterizedType = (ParameterizedType) t;
+                        fieldClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                    }
+                    jobHandleParamInfo.addChildren(getParamInfo(fieldClass,  f));
+                }
+            }
+            i++;
+        }
+    }
+
+    private  JobHandleParamInfo getParamInfo(Type t,Field field){
+        JobHandleParamInfo jobHandleParamInfo = new JobHandleParamInfo();
+        Class<?> clazz = (Class<?>) t;
+        String clazzName = clazz.getName();
+        String name = ClassUtils.getShortName(clazzName);
+        if (field != null) {
+            name = field.getName();
+        }
+        jobHandleParamInfo.setParamType(0);
+        jobHandleParamInfo.setName(name);
+        if (field != null) {
+            Param paramAnnotation = field.getAnnotation(Param.class);
+            if (paramAnnotation != null) {
+                jobHandleParamInfo.setValue(paramAnnotation.value());
+            }
+        }
+        if (clazz.isArray()) {
+            jobHandleParamInfo.setName("Array");
+            jobHandleParamInfo.setClassName("Array");
+            Class<?> newClass = clazz.getComponentType();
+            jobHandleParamInfo.addChildren(getParamInfo(newClass, field));
+         }else if (ReflectionUtil.isPrimitive(clazz)) {
+
+        } else if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+            if (t instanceof ParameterizedType) {
+                Type[] types = ((ParameterizedType) t).getActualTypeArguments();
+                for (Type newType : types) {
+                    jobHandleParamInfo.addChildren(getParamInfo(newType, field));
+                }
+            }
+        } else {
+            Field[] fields = clazz.getDeclaredFields();
+            Map<String, Method> mapMethods = ReflectionUtil.getBeanPropertyReadMethods(clazz);
+            for (Field f : fields) {
+                if (!mapMethods.containsKey(f.getName())) {
+                    continue;
+                }
+                Class<?> fieldClass = f.getType();
+                Type genericType = f.getGenericType();
+                if (genericType.getTypeName().equals("T") && t instanceof ParameterizedType) {
+                    ParameterizedType parameterizedType = (ParameterizedType) t;
+                    fieldClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                }
+                jobHandleParamInfo.addChildren(getParamInfo(fieldClass,  f));
+            }
+        }
+        return jobHandleParamInfo;
     }
 
     /**

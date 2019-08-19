@@ -22,9 +22,13 @@ public class JobHandleInfo {
 
     private String methodName;
 
+    private String returnExample;
+
+    private JobHandleParamInfo GenericReturn;
+
     private Long serialVersionUID;
 
-    private List<JobHandleParamInfo> jobHandleParamInfos;
+    private List<JobHandleParamInfo> genericParameters;
 
     public String getName() {
         return name;
@@ -66,12 +70,28 @@ public class JobHandleInfo {
         this.serialVersionUID = serialVersionUID;
     }
 
-    public List<JobHandleParamInfo> getJobHandleParamInfos() {
-        return jobHandleParamInfos;
+    public String getReturnExample() {
+        return returnExample;
     }
 
-    public void setJobHandleParamInfos(List<JobHandleParamInfo> jobHandleParamInfos) {
-        this.jobHandleParamInfos = jobHandleParamInfos;
+    public void setReturnExample(String returnExample) {
+        this.returnExample = returnExample;
+    }
+
+    public JobHandleParamInfo getGenericReturn() {
+        return GenericReturn;
+    }
+
+    public void setGenericReturn(JobHandleParamInfo genericReturn) {
+        GenericReturn = genericReturn;
+    }
+
+    public List<JobHandleParamInfo> getGenericParameters() {
+        return genericParameters;
+    }
+
+    public void setGenericParameters(List<JobHandleParamInfo> genericParameters) {
+        this.genericParameters = genericParameters;
     }
 
     @Override
@@ -81,8 +101,10 @@ public class JobHandleInfo {
                 ", cover=" + cover +
                 ", className='" + className + '\'' +
                 ", methodName='" + methodName + '\'' +
+                ", returnExample='" + returnExample + '\'' +
+                ", GenericReturn=" + GenericReturn +
                 ", serialVersionUID=" + serialVersionUID +
-                ", jobHandleParamInfos=" + jobHandleParamInfos +
+                ", genericParameters=" + genericParameters +
                 '}';
     }
 }
