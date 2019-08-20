@@ -5,6 +5,7 @@ import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.Execute;
 import com.xxl.job.core.handler.annotation.JobHandler;
+import com.xxl.job.core.handler.annotation.Param;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -41,7 +42,7 @@ public class DemoJobHandler extends IJobHandler {
 	 */
 	@Order
 	@Execute
-	public ReturnT<String> stat() {
+	public ReturnT<String> stat(@Param("测试") String param) {
 		return null;
 	}
 
