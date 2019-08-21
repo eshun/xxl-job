@@ -230,6 +230,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
         }
         jobHandleParamInfo.setParamType(0);
         jobHandleParamInfo.setName(name);
+        jobHandleParamInfo.setClassName(clazzName);
         if (field != null) {
             Param paramAnnotation = field.getAnnotation(Param.class);
             if (paramAnnotation != null) {

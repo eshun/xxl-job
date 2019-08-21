@@ -31,18 +31,13 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class DemoJobHandler extends IJobHandler {
 
-	@Execute
-	public String test() {
-		return null;
-	}
-
 	/**
 	 * Order越小越前
 	 * @return
 	 */
 	@Order
 	@Execute
-	public ReturnT<String> stat(@Param("测试") String param) {
+	public ReturnT<String> stat(@Param("测试") String param,@Param("测试") String[] params) {
 		return null;
 	}
 
