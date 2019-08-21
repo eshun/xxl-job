@@ -1,6 +1,7 @@
 package com.xxl.job.core.thread;
 
 import com.xxl.job.core.biz.AdminBiz;
+import com.xxl.job.core.biz.model.JobHandleInfo;
 import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.RegistryConfig;
@@ -8,6 +9,7 @@ import com.xxl.job.core.executor.XxlJobExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,6 +25,7 @@ public class ExecutorRegistryThread {
 
     private Thread registryThread;
     private volatile boolean toStop = false;
+    private boolean isRegistry=false;
     public void start(final String appName, final String address){
 
         // valid
@@ -42,6 +45,9 @@ public class ExecutorRegistryThread {
                 // registry
                 while (!toStop) {
                     try {
+                        List<JobHandleInfo> jobHandleInfos= !isRegistry ? XxlJobExecutor.getJobHandleInfos():null;
+                        Integer[] tasks=isRegistry?XxlJobExecutor.getJobTreadSize():null;
+
                         RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), appName, address);
                         for (AdminBiz adminBiz: XxlJobExecutor.getAdminBizList()) {
                             try {
