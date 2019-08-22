@@ -1,6 +1,6 @@
 package com.xxl.job.core.executor;
 
-import com.xxl.job.core.biz.AdminBiz;
+import com.xxl.job.core.biz.ConsoleBiz;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.impl.ExecutorBizImpl;
 import com.xxl.job.core.biz.model.JobHandleInfo;
@@ -94,7 +94,7 @@ public class XxlJobExecutor {
         // init logpath
         XxlJobFileAppender.initLogPath(logPath);
 
-        // init invoker, admin-client
+        // init invoker, console-client
         initAdminBizList(adminAddresses, accessToken);
 
 
@@ -135,8 +135,8 @@ public class XxlJobExecutor {
     }
 
 
-    // ---------------------- admin-client (rpc invoker) ----------------------
-    private static List<AdminBiz> adminBizList;
+    // ---------------------- console-client (rpc invoker) ----------------------
+    private static List<ConsoleBiz> consoleBizList;
     private static Serializer serializer;
 
     private void initAdminBizList(String adminAddresses, String accessToken) throws Exception {
@@ -145,14 +145,14 @@ public class XxlJobExecutor {
             for (String address : adminAddresses.trim().split(",")) {
                 if (address != null && address.trim().length() > 0) {
 
-                    String addressUrl = address.concat(AdminBiz.MAPPING);
+                    String addressUrl = address.concat(ConsoleBiz.MAPPING);
 
-                    AdminBiz adminBiz = (AdminBiz) new XxlRpcReferenceBean(
+                    ConsoleBiz consoleBiz = (ConsoleBiz) new XxlRpcReferenceBean(
                             NetEnum.NETTY_HTTP,
                             serializer,
                             CallType.SYNC,
                             LoadBalance.ROUND,
-                            AdminBiz.class,
+                            ConsoleBiz.class,
                             null,
                             3000,
                             addressUrl,
@@ -161,10 +161,10 @@ public class XxlJobExecutor {
                             null
                     ).getObject();
 
-                    if (adminBizList == null) {
-                        adminBizList = new ArrayList<AdminBiz>();
+                    if (consoleBizList == null) {
+                        consoleBizList = new ArrayList<ConsoleBiz>();
                     }
-                    adminBizList.add(adminBiz);
+                    consoleBizList.add(consoleBiz);
                 }
             }
         }
@@ -179,8 +179,8 @@ public class XxlJobExecutor {
         }
     }
 
-    public static List<AdminBiz> getAdminBizList() {
-        return adminBizList;
+    public static List<ConsoleBiz> getConsoleBizList() {
+        return consoleBizList;
     }
 
     public static Serializer getSerializer() {

@@ -1,6 +1,6 @@
 package com.xxl.job.core.thread;
 
-import com.xxl.job.core.biz.AdminBiz;
+import com.xxl.job.core.biz.ConsoleBiz;
 import com.xxl.job.core.biz.model.HandleCallbackParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.RegistryConfig;
@@ -47,7 +47,7 @@ public class TriggerCallbackThread {
     public void start() {
 
         // valid
-        if (XxlJobExecutor.getAdminBizList() == null) {
+        if (XxlJobExecutor.getConsoleBizList() == null) {
             logger.warn(">>>>>>>>>>> xxl-job, executor callback config fail, adminAddresses is null.");
             return;
         }
@@ -133,7 +133,7 @@ public class TriggerCallbackThread {
     public void toStop(){
         toStop = true;
         // stop callback, interrupt and wait
-        if (triggerCallbackThread != null) {    // support empty admin address
+        if (triggerCallbackThread != null) {    // support empty console address
             triggerCallbackThread.interrupt();
             try {
                 triggerCallbackThread.join();
@@ -161,9 +161,9 @@ public class TriggerCallbackThread {
     private void doCallback(List<HandleCallbackParam> callbackParamList){
         boolean callbackRet = false;
         // callback, will retry if error
-        for (AdminBiz adminBiz: XxlJobExecutor.getAdminBizList()) {
+        for (ConsoleBiz consoleBiz : XxlJobExecutor.getConsoleBizList()) {
             try {
-                ReturnT<String> callbackResult = adminBiz.callback(callbackParamList);
+                ReturnT<String> callbackResult = consoleBiz.callback(callbackParamList);
                 if (callbackResult!=null && ReturnT.SUCCESS_CODE == callbackResult.getCode()) {
                     callbackLog(callbackParamList, "<br>----------- xxl-job job callback finish.");
                     callbackRet = true;

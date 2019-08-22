@@ -1,6 +1,6 @@
 package com.xxl.job.core.thread;
 
-import com.xxl.job.core.biz.AdminBiz;
+import com.xxl.job.core.biz.ConsoleBiz;
 import com.xxl.job.core.biz.model.JobHandleInfo;
 import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -33,7 +33,7 @@ public class ExecutorRegistryThread {
             logger.warn(">>>>>>>>>>> xxl-job, executor registry config fail, appName is null.");
             return;
         }
-        if (XxlJobExecutor.getAdminBizList() == null) {
+        if (XxlJobExecutor.getConsoleBizList() == null) {
             logger.warn(">>>>>>>>>>> xxl-job, executor registry config fail, adminAddresses is null.");
             return;
         }
@@ -49,9 +49,9 @@ public class ExecutorRegistryThread {
                         Integer[] tasks=isRegistry?XxlJobExecutor.getJobTreadSize():null;
 
                         RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), appName, address);
-                        for (AdminBiz adminBiz: XxlJobExecutor.getAdminBizList()) {
+                        for (ConsoleBiz consoleBiz : XxlJobExecutor.getConsoleBizList()) {
                             try {
-                                ReturnT<String> registryResult = adminBiz.registry(registryParam);
+                                ReturnT<String> registryResult = consoleBiz.registry(registryParam);
                                 if (registryResult!=null && ReturnT.SUCCESS_CODE == registryResult.getCode()) {
                                     registryResult = ReturnT.SUCCESS;
                                     logger.debug(">>>>>>>>>>> xxl-job registry success, registryParam:{}, registryResult:{}", new Object[]{registryParam, registryResult});
@@ -85,9 +85,9 @@ public class ExecutorRegistryThread {
                 // registry remove
                 try {
                     RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), appName, address);
-                    for (AdminBiz adminBiz: XxlJobExecutor.getAdminBizList()) {
+                    for (ConsoleBiz consoleBiz : XxlJobExecutor.getConsoleBizList()) {
                         try {
-                            ReturnT<String> registryResult = adminBiz.registryRemove(registryParam);
+                            ReturnT<String> registryResult = consoleBiz.registryRemove(registryParam);
                             if (registryResult!=null && ReturnT.SUCCESS_CODE == registryResult.getCode()) {
                                 registryResult = ReturnT.SUCCESS;
                                 logger.info(">>>>>>>>>>> xxl-job registry-remove success, registryParam:{}, registryResult:{}", new Object[]{registryParam, registryResult});
