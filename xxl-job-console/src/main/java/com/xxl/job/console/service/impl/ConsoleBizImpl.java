@@ -36,7 +36,6 @@ public class ConsoleBizImpl implements ConsoleBiz {
     @Resource
     private XxlJobRegistryDao xxlJobRegistryDao;
 
-
     @Override
     public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList) {
         for (HandleCallbackParam handleCallbackParam: callbackParamList) {
@@ -136,4 +135,7 @@ public class ConsoleBizImpl implements ConsoleBiz {
         return ReturnT.SUCCESS;
     }
 
+    private void initExecutor(){
+
+    }
 }

@@ -1,7 +1,7 @@
 package com.xxl.job.console.core.thread;
 
 import com.xxl.job.console.config.XxlJobAdminConfig;
-import com.xxl.job.console.core.util.CronExpression;
+import com.xxl.job.console.core.util.cron.CronExpression;
 import com.xxl.job.console.model.XxlJobInfo;
 import com.xxl.job.console.core.trigger.TriggerTypeEnum;
 import org.slf4j.Logger;

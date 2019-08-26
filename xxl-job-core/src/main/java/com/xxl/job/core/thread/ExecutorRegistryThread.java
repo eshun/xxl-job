@@ -46,9 +46,11 @@ public class ExecutorRegistryThread {
                 while (!toStop) {
                     try {
                         List<JobHandleInfo> jobHandleInfos= !isRegistry ? XxlJobExecutor.getJobHandleInfos():null;
-                        Integer[] tasks=isRegistry?XxlJobExecutor.getJobTreadSize():null;
+                        Integer[] jobs=isRegistry?XxlJobExecutor.getJobTreadSize():null;
 
                         RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), appName, address);
+                        registryParam.setJobHandleInfos(jobHandleInfos);
+                        registryParam.setJobs(jobs);
                         for (ConsoleBiz consoleBiz : XxlJobExecutor.getConsoleBizList()) {
                             try {
                                 ReturnT<String> registryResult = consoleBiz.registry(registryParam);
