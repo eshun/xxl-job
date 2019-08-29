@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -212,5 +214,29 @@ public class JobThread extends Thread{
 		}
 
 		logger.info(">>>>>>>>>>> xxl-job JobThread stoped, hashCode:{}", Thread.currentThread());
+	}
+
+	public static ReturnT<Object> invoke(IJobHandler handler,TriggerParam triggerParam) {
+		try {
+			Class<?> c = handler.getClass();
+			Method method = c.getMethod(triggerParam.getExecutorMethod());
+			Class<?> clazz = method.getReturnType();
+			Object retObject = null;
+			if (clazz == void.class || clazz == Void.class) {
+				method.invoke(handler, null);
+			} else {
+				retObject = method.invoke(handler, null);
+			}
+
+		} catch (NoSuchMethodException e) {
+
+		} catch (IllegalAccessException e) {
+
+		} catch (IllegalArgumentException e) {
+
+		} catch (InvocationTargetException e) {
+
+		}
+		return  null;
 	}
 }

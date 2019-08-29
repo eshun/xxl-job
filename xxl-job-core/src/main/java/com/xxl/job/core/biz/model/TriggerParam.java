@@ -15,6 +15,16 @@ public class TriggerParam implements Serializable{
     private String executorBlockStrategy;
     private int executorTimeout;
 
+    private String executorMethod;
+
+    public String getExecutorMethod() {
+        return executorMethod;
+    }
+
+    public void setExecutorMethod(String executorMethod) {
+        this.executorMethod = executorMethod;
+    }
+
     private long logId;
     private long logDateTim;
 
