@@ -1,6 +1,6 @@
 package com.xxl.job.console.dao;
 
-import com.xxl.job.console.model.JobApp;
+import com.xxl.job.console.model.App;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,7 +19,7 @@ public interface AppDao {
      * @author esun
      * @date 2019/08/26
      **/
-    int insert(JobApp jobApp);
+    int insert(App app);
 
     /**
      * [刪除]
@@ -33,22 +33,22 @@ public interface AppDao {
      * @author esun
      * @date 2019/08/26
      **/
-    int update(JobApp jobApp);
+    int update(App app);
 
     /**
      * [查詢] 根據主鍵 id 查詢
      * @author esun
      * @date 2019/08/26
      **/
-    JobApp load(@Param("id") int id);
+    App load(@Param("id") int id);
 
     /**
      * [查詢] 分頁查詢
      * @author esun
      * @date 2019/08/26
      **/
-    List<JobApp> query(@Param("offset") int offset,
-                       @Param("pageSize") int pageSize);
+    List<App> query(@Param("offset") int offset,
+                    @Param("pageSize") int pageSize);
 
     /**
      * [查詢] 分頁查詢 count

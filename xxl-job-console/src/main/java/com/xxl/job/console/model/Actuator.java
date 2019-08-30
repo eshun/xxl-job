@@ -1,5 +1,6 @@
 package com.xxl.job.console.model;
 
+import com.xxl.job.console.core.util.SnowflakeId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,6 +14,13 @@ import java.util.Date;
 @Data
 public class Actuator implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public Actuator() {
+        this.id= SnowflakeId.getId();
+        this.status = 0;
+        this.createTime = new Date();
+        this.updateTime = new Date();
+    }
 
     /**
      * 主键
@@ -52,7 +60,7 @@ public class Actuator implements Serializable {
     /**
      * 执行器状态，0正常1失效
      */
-    private Integer isStatus;
+    private Integer status;
 
     /**
      * 创建时间
@@ -63,8 +71,5 @@ public class Actuator implements Serializable {
      * 修改时间
      */
     private Date updateTime;
-
-    public Actuator() {
-    }
 
 }

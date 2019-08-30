@@ -1,5 +1,6 @@
 package com.xxl.job.console.model;
 
+import com.xxl.job.console.core.util.SnowflakeId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,8 +12,15 @@ import java.util.Date;
  * @date: 2019/8/26
  */
 @Data
-public class JobApp implements Serializable {
+public class App implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public App() {
+        this.id= SnowflakeId.getId();
+        this.online = 1;
+        this.createTime = new Date();
+        this.updateTime = new Date();
+    }
 
     /**
      * 主键
@@ -53,8 +61,4 @@ public class JobApp implements Serializable {
      * 执行中任务数
      */
     private String jobInfo;
-
-    public JobApp() {
-    }
-
 }

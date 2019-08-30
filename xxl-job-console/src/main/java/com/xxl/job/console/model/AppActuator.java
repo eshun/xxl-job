@@ -1,5 +1,6 @@
 package com.xxl.job.console.model;
 
+import com.xxl.job.console.core.util.SnowflakeId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -34,6 +35,7 @@ public class AppActuator implements Serializable {
     private Integer resTimeMs;
 
     public AppActuator() {
+        this.id= SnowflakeId.getId();
     }
 
 }

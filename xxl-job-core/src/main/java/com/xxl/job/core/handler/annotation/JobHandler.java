@@ -17,5 +17,9 @@ public @interface JobHandler {
 
     String value() default "";
 
+    /**
+     * 强制更新服务执行器
+     * @return
+     */
     boolean cover() default false;
 }

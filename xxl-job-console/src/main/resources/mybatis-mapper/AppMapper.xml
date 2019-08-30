@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xxl.job.console.dao.AppDao">
 
-    <resultMap id="ResultMap" type="com.xxl.job.console.model.JobApp" >
+    <resultMap id="ResultMap" type="com.xxl.job.console.model.App" >
         <result column="id" property="id" />
         <result column="name" property="name" />
         <result column="ip" property="ip" />
@@ -25,7 +25,7 @@
                 `job_info`
     </sql>
 
-    <insert id="insert" useGeneratedKeys="true" keyColumn="id" parameterType="com.xxl.job.console.model.JobApp">
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" parameterType="com.xxl.job.console.model.App">
         INSERT INTO xxl_job_app
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test ='null != id'>
@@ -86,7 +86,7 @@
         WHERE `id` = #{id}
     </delete>
 
-    <update id="update" parameterType="com.xxl.job.console.model.JobApp">
+    <update id="update" parameterType="com.xxl.job.console.model.App">
         UPDATE xxl_job_app
         <set>
             <if test ='null != id'>id = #{id},</if>

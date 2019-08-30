@@ -1,5 +1,6 @@
 package com.xxl.job.console.model;
 
+import com.xxl.job.console.core.util.SnowflakeId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,6 +13,10 @@ import java.io.Serializable;
 @Data
 public class ActuatorParam implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public ActuatorParam() {
+        this.id= SnowflakeId.getId();
+    }
 
     /**
      * 主键
@@ -57,8 +62,4 @@ public class ActuatorParam implements Serializable {
      * 0入参 1出参
      */
     private Integer paramType;
-
-    public ActuatorParam() {
-    }
-
 }

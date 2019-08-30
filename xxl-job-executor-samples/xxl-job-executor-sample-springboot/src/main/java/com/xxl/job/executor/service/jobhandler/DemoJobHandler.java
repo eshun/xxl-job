@@ -8,6 +8,7 @@ import com.xxl.job.core.log.XxlJobLogger;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 
@@ -24,7 +25,11 @@ import java.util.concurrent.TimeUnit;
  */
 @JobHandler(value="demoJobHandler")
 @Component
-public class DemoJobHandler extends IJobHandler {
+public class DemoJobHandler extends IJobHandler implements Serializable {
+	/**
+	 * 若存在serialVersionUID,UID发生变化注册时会刷新执行器
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Order越小越前
