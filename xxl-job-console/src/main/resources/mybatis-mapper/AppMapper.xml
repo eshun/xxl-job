@@ -101,10 +101,22 @@
         WHERE `id` = #{id}
     </update>
 
+    <update id="offline" parameterType="java.lang.Integer" >
+		UPDATE xxl_job_app
+		SET `app_online` = 1
+		WHERE update_time <![CDATA[ < ]]> DATE_ADD(NOW(),INTERVAL -#{timeout} SECOND)
+	</update>
+
     <select id="load" resultMap="ResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM xxl_job_app
         WHERE `id` = #{id}
+    </select>
+
+    <select id="loadBy" resultMap="ResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM xxl_job_app
+        WHERE `name` = #{name} AND 'ip'=#{ip} AND 'port'=#{port}
     </select>
 
     <select id="query" resultMap="ResultMap">

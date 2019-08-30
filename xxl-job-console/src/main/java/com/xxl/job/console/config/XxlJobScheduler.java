@@ -96,12 +96,12 @@ public class XxlJobScheduler implements InitializingBean, DisposableBean {
                 Serializer.SerializeEnum.HESSIAN.getSerializer(),
                 null,
                 0,
-                XxlJobConsoleConfig.getAdminConfig().getAccessToken(),
+                XxlJobConsoleConfig.getConsoleConfig().getAccessToken(),
                 null,
                 null);
 
         // add services
-        xxlRpcProviderFactory.addService(ConsoleBiz.class.getName(), null, XxlJobConsoleConfig.getAdminConfig().getConsoleBiz());
+        xxlRpcProviderFactory.addService(ConsoleBiz.class.getName(), null, XxlJobConsoleConfig.getConsoleConfig().getConsoleBiz());
 
         // servlet handler
         servletServerHandler = new ServletServerHandler(xxlRpcProviderFactory);
@@ -139,7 +139,7 @@ public class XxlJobScheduler implements InitializingBean, DisposableBean {
                 null,
                 3000,
                 address,
-                XxlJobConsoleConfig.getAdminConfig().getAccessToken(),
+                XxlJobConsoleConfig.getConsoleConfig().getAccessToken(),
                 null,
                 null).getObject();
 

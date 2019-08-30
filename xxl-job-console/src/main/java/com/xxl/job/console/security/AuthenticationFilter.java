@@ -31,8 +31,8 @@ import java.util.Set;
  * @date: 2019-06-19
  * @version v1.0
  */
-public class ConsoleAuthenticationFilter extends OncePerRequestFilter {
-    private static final Logger logger = LoggerFactory.getLogger(ConsoleAuthenticationFilter.class);
+public class AuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
 
     /**
      * 允许 不拦截url

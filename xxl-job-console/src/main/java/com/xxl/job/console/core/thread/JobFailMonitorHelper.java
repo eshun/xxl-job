@@ -46,24 +46,24 @@ public class JobFailMonitorHelper {
 				while (!toStop) {
 					try {
 
-						List<Long> failLogIds = XxlJobConsoleConfig.getAdminConfig().getXxlJobLogDao().findFailJobLogIds(1000);
+						List<Long> failLogIds = XxlJobConsoleConfig.getConsoleConfig().getXxlJobLogDao().findFailJobLogIds(1000);
 						if (failLogIds!=null && !failLogIds.isEmpty()) {
 							for (long failLogId: failLogIds) {
 
 								// lock log
-								int lockRet = XxlJobConsoleConfig.getAdminConfig().getXxlJobLogDao().updateAlarmStatus(failLogId, 0, -1);
+								int lockRet = XxlJobConsoleConfig.getConsoleConfig().getXxlJobLogDao().updateAlarmStatus(failLogId, 0, -1);
 								if (lockRet < 1) {
 									continue;
 								}
-								XxlJobLog log = XxlJobConsoleConfig.getAdminConfig().getXxlJobLogDao().load(failLogId);
-								XxlJobInfo info = XxlJobConsoleConfig.getAdminConfig().getXxlJobInfoDao().loadById(log.getJobId());
+								XxlJobLog log = XxlJobConsoleConfig.getConsoleConfig().getXxlJobLogDao().load(failLogId);
+								XxlJobInfo info = XxlJobConsoleConfig.getConsoleConfig().getXxlJobInfoDao().loadById(log.getJobId());
 
 								// 1、fail retry monitor
 								if (log.getExecutorFailRetryCount() > 0) {
 									JobTriggerPoolHelper.trigger(log.getJobId(), TriggerTypeEnum.RETRY, (log.getExecutorFailRetryCount()-1), log.getExecutorShardingParam(), null);
 									String retryMsg = "<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_type_retry") +"<<<<<<<<<<< </span><br>";
 									log.setTriggerMsg(log.getTriggerMsg() + retryMsg);
-									XxlJobConsoleConfig.getAdminConfig().getXxlJobLogDao().updateTriggerInfo(log);
+									XxlJobConsoleConfig.getConsoleConfig().getXxlJobLogDao().updateTriggerInfo(log);
 								}
 
 								// 2、fail alarm monitor
@@ -81,7 +81,7 @@ public class JobFailMonitorHelper {
 									newAlarmStatus = 1;
 								}
 
-								XxlJobConsoleConfig.getAdminConfig().getXxlJobLogDao().updateAlarmStatus(failLogId, -1, newAlarmStatus);
+								XxlJobConsoleConfig.getConsoleConfig().getXxlJobLogDao().updateAlarmStatus(failLogId, -1, newAlarmStatus);
 							}
 						}
 
@@ -160,7 +160,7 @@ public class JobFailMonitorHelper {
 			}
 
 			// email info
-			XxlJobGroup group = XxlJobConsoleConfig.getAdminConfig().getXxlJobGroupDao().load(Integer.valueOf(info.getJobGroup()));
+			XxlJobGroup group = XxlJobConsoleConfig.getConsoleConfig().getXxlJobGroupDao().load(Integer.valueOf(info.getJobGroup()));
 			String personal = I18nUtil.getString("admin_name_full");
 			String title = I18nUtil.getString("jobconf_monitor");
 			String content = MessageFormat.format(mailBodyTemplate,
@@ -174,15 +174,15 @@ public class JobFailMonitorHelper {
 
 				// make mail
 				try {
-					MimeMessage mimeMessage = XxlJobConsoleConfig.getAdminConfig().getMailSender().createMimeMessage();
+					MimeMessage mimeMessage = XxlJobConsoleConfig.getConsoleConfig().getMailSender().createMimeMessage();
 
 					MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-					helper.setFrom(XxlJobConsoleConfig.getAdminConfig().getEmailUserName(), personal);
+					helper.setFrom(XxlJobConsoleConfig.getConsoleConfig().getEmailUserName(), personal);
 					helper.setTo(email);
 					helper.setSubject(title);
 					helper.setText(content, true);
 
-					XxlJobConsoleConfig.getAdminConfig().getMailSender().send(mimeMessage);
+					XxlJobConsoleConfig.getConsoleConfig().getMailSender().send(mimeMessage);
 				} catch (Exception e) {
 					logger.error(">>>>>>>>>>> xxl-job, job fail alarm email send error, JobLogId:{}", jobLog.getId(), e);
 

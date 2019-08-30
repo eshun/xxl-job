@@ -24,7 +24,7 @@ public interface AppActuatorDao {
      * @author esun
      * @date 2019/08/26
      **/
-    int delete(@Param("id") int id);
+    int delete(@Param("appId") Long appId);
 
     /**
      * [更新]

@@ -16,10 +16,11 @@ public class App implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public App() {
-        this.id= SnowflakeId.getId();
+        this.id = SnowflakeId.getId();
         this.online = 1;
         this.createTime = new Date();
         this.updateTime = new Date();
+        this.jobInfo = "";
     }
 
     /**

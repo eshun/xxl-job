@@ -26,7 +26,7 @@ public class ExecutorRegistryThread {
     private Thread registryThread;
     private volatile boolean toStop = false;
     private boolean isRegistry=false;
-    public void start(final String appName, final String address){
+    public void start(final String appName, final String ip, final String port){
 
         // valid
         if (appName==null || appName.trim().length()==0) {
@@ -41,6 +41,7 @@ public class ExecutorRegistryThread {
         registryThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                RegistryParam registryParam = new RegistryParam(appName, ip, port);
 
                 // registry
                 while (!toStop) {
@@ -48,7 +49,6 @@ public class ExecutorRegistryThread {
                         List<JobHandleInfo> jobHandleInfos= !isRegistry ? XxlJobExecutor.getJobHandleInfos():null;
                         Integer[] jobs=isRegistry?XxlJobExecutor.getJobTreadSize():null;
 
-                        RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), appName, address);
                         registryParam.setJobHandleInfos(jobHandleInfos);
                         registryParam.setJobs(jobs);
                         for (ConsoleBiz consoleBiz : XxlJobExecutor.getConsoleBizList()) {
@@ -86,7 +86,6 @@ public class ExecutorRegistryThread {
 
                 // registry remove
                 try {
-                    RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), appName, address);
                     for (ConsoleBiz consoleBiz : XxlJobExecutor.getConsoleBizList()) {
                         try {
                             ReturnT<String> registryResult = consoleBiz.registryRemove(registryParam);

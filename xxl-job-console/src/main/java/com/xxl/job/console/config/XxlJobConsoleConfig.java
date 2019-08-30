@@ -1,9 +1,7 @@
 package com.xxl.job.console.config;
 
-import com.xxl.job.console.dao.XxlJobGroupDao;
 import com.xxl.job.console.dao.XxlJobInfoDao;
 import com.xxl.job.console.dao.XxlJobLogDao;
-import com.xxl.job.console.dao.XxlJobRegistryDao;
 import com.xxl.job.console.service.ActuatorService;
 import com.xxl.job.console.service.AppService;
 import com.xxl.job.core.biz.ConsoleBiz;
@@ -23,7 +21,7 @@ import javax.sql.DataSource;
 @Component
 public class XxlJobConsoleConfig implements InitializingBean{
     private static XxlJobConsoleConfig consoleConfig = null;
-    public static XxlJobConsoleConfig getAdminConfig() {
+    public static XxlJobConsoleConfig getConsoleConfig() {
         return consoleConfig;
     }
 
@@ -62,10 +60,6 @@ public class XxlJobConsoleConfig implements InitializingBean{
     @Resource
     private XxlJobInfoDao xxlJobInfoDao;
     @Resource
-    private XxlJobRegistryDao xxlJobRegistryDao;
-    @Resource
-    private XxlJobGroupDao xxlJobGroupDao;
-    @Resource
     private ConsoleBiz consoleBiz;
     @Resource
     private JavaMailSender mailSender;
@@ -103,14 +97,6 @@ public class XxlJobConsoleConfig implements InitializingBean{
 
     public XxlJobInfoDao getXxlJobInfoDao() {
         return xxlJobInfoDao;
-    }
-
-    public XxlJobRegistryDao getXxlJobRegistryDao() {
-        return xxlJobRegistryDao;
-    }
-
-    public XxlJobGroupDao getXxlJobGroupDao() {
-        return xxlJobGroupDao;
     }
 
     public ConsoleBiz getConsoleBiz() {

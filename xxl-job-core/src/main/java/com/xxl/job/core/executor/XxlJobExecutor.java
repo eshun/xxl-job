@@ -194,10 +194,10 @@ public class XxlJobExecutor {
     private void initRpcProvider(String ip, int port, String appName, String accessToken) throws Exception {
 
         // init, provider factory
-        String address = IpUtil.getIpPort(ip, port);
-        Map<String, String> serviceRegistryParam = new HashMap<String, String>();
+        Map<String, String> serviceRegistryParam = new HashMap<>();
         serviceRegistryParam.put("appName", appName);
-        serviceRegistryParam.put("address", address);
+        serviceRegistryParam.put("ip", ip);
+        serviceRegistryParam.put("port", String.valueOf(port));
 
         xxlRpcProviderFactory = new XxlRpcProviderFactory();
         xxlRpcProviderFactory.initConfig(NetEnum.NETTY_HTTP, Serializer.SerializeEnum.HESSIAN.getSerializer(), ip, port, accessToken, ExecutorServiceRegistry.class, serviceRegistryParam);
@@ -215,7 +215,7 @@ public class XxlJobExecutor {
         @Override
         public void start(Map<String, String> param) {
             // start registry
-            ExecutorRegistryThread.getInstance().start(param.get("appName"), param.get("address"));
+            ExecutorRegistryThread.getInstance().start(param.get("appName"), param.get("ip"), param.get("port"));
         }
 
         @Override

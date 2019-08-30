@@ -1,5 +1,6 @@
 package com.xxl.job.console.service.impl;
 
+import com.xxl.job.console.model.App;
 import com.xxl.job.console.model.XxlJobInfo;
 import com.xxl.job.console.model.XxlJobLog;
 import com.xxl.job.console.core.thread.JobTriggerPoolHelper;
@@ -7,12 +8,11 @@ import com.xxl.job.console.core.trigger.TriggerTypeEnum;
 import com.xxl.job.console.core.util.I18nUtil;
 import com.xxl.job.console.dao.XxlJobInfoDao;
 import com.xxl.job.console.dao.XxlJobLogDao;
-import com.xxl.job.console.dao.XxlJobRegistryDao;
+import com.xxl.job.console.service.AppService;
 import com.xxl.job.core.biz.ConsoleBiz;
 import com.xxl.job.core.biz.model.HandleCallbackParam;
 import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.handler.IJobHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,8 +33,9 @@ public class ConsoleBizImpl implements ConsoleBiz {
     public XxlJobLogDao xxlJobLogDao;
     @Resource
     private XxlJobInfoDao xxlJobInfoDao;
+
     @Resource
-    private XxlJobRegistryDao xxlJobRegistryDao;
+    AppService appService;
 
     @Override
     public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList) {
@@ -123,16 +124,51 @@ public class ConsoleBizImpl implements ConsoleBiz {
 
     @Override
     public ReturnT<String> registry(RegistryParam registryParam) {
-        int ret = xxlJobRegistryDao.registryUpdate(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
-        if (ret < 1) {
-            xxlJobRegistryDao.registrySave(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
+        if (registryParam != null) {
+            String name = registryParam.getRegistName();
+            String ip = registryParam.getRegistryIp();
+            int port = Integer.parseInt(registryParam.getRegistryPort());
+            Integer[] jobs = registryParam.getJobs();
+
+            App app = appService.loadBy(name, ip, port);
+            if (app != null) {
+                app.setOnline(0);
+                app.setUpdateTime(new Date());
+                if (jobs != null && jobs.length > 0) {
+                    String jobInfoStr = null;
+                    for (Integer job : jobs) {
+                        jobInfoStr += job + ",";
+                    }
+                    jobInfoStr = jobInfoStr.substring(0, jobInfoStr.length() - 1);
+                    app.setJobInfo(jobInfoStr);
+                }
+                appService.update(app);
+            } else {
+                app = new App();
+                app.setOnline(0);
+                app.setIp(ip);
+                app.setName(name);
+                app.setPort(port);
+                appService.insert(app);
+            }
         }
         return ReturnT.SUCCESS;
     }
 
     @Override
     public ReturnT<String> registryRemove(RegistryParam registryParam) {
-        xxlJobRegistryDao.registryDelete(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
+        if (registryParam != null) {
+            String name = registryParam.getRegistName();
+            String ip = registryParam.getRegistryIp();
+            int port = Integer.parseInt(registryParam.getRegistryPort());
+            App app = appService.loadBy(name, ip, port);
+            if (app != null) {
+                app.setOnline(1);
+                app.setUpdateTime(new Date());
+                app.setJobInfo("");
+                appService.update(app);
+            }
+        }
         return ReturnT.SUCCESS;
     }
 

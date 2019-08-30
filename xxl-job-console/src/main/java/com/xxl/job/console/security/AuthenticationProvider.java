@@ -11,7 +11,7 @@ import org.springframework.security.core.AuthenticationException;
  * @version v1.0
  * @date: 2019-06-20
  */
-public class ConsoleAuthenticationProvider implements AuthenticationProvider {
+public class AuthenticationProvider implements org.springframework.security.authentication.AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         return null;

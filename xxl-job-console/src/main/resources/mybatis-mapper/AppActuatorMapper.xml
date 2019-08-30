@@ -51,7 +51,7 @@
 
     <delete id="delete" >
         DELETE FROM xxl_job_app_actuator
-        WHERE `id_` = #{id}
+        WHERE `app_id` = #{appId}
     </delete>
 
     <update id="update" parameterType="com.xxl.job.console.model.AppActuator">
@@ -62,7 +62,7 @@
             <if test ='null != appId'>app_id = #{appId},</if>
             <if test ='null != resTimeMs'>res_time_ms = #{resTimeMs}</if>
         </set>
-        WHERE `id_` = #{id}
+        WHERE `id` = #{id}
     </update>
 
 </mapper>

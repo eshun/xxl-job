@@ -10,18 +10,18 @@ import java.util.List;
 public class RegistryParam implements Serializable {
     private static final long serialVersionUID = 42L;
 
-    private String registGroup;
-    private String registryKey;
-    private String registryValue;
+    private String registName;
+    private String registryIp;
+    private String registryPort;
 
-    List<JobHandleInfo> jobHandleInfos;
-    Integer[] jobs;
+    private List<JobHandleInfo> jobHandleInfos;
+    private Integer[] jobs;
 
     public RegistryParam(){}
-    public RegistryParam(String registGroup, String registryKey, String registryValue) {
-        this.registGroup = registGroup;
-        this.registryKey = registryKey;
-        this.registryValue = registryValue;
+    public RegistryParam(String registName, String registryIp, String registryPort) {
+        this.registName = registName;
+        this.registryIp = registryIp;
+        this.registryPort = registryPort;
     }
 
     public List<JobHandleInfo> getJobHandleInfos() {
@@ -40,36 +40,36 @@ public class RegistryParam implements Serializable {
         this.jobs = jobs;
     }
 
-    public String getRegistGroup() {
-        return registGroup;
+    public String getRegistName() {
+        return registName;
     }
 
-    public void setRegistGroup(String registGroup) {
-        this.registGroup = registGroup;
+    public void setRegistName(String registName) {
+        this.registName = registName;
     }
 
-    public String getRegistryKey() {
-        return registryKey;
+    public String getRegistryIp() {
+        return registryIp;
     }
 
-    public void setRegistryKey(String registryKey) {
-        this.registryKey = registryKey;
+    public void setRegistryIp(String registryIp) {
+        this.registryIp = registryIp;
     }
 
-    public String getRegistryValue() {
-        return registryValue;
+    public String getRegistryPort() {
+        return registryPort;
     }
 
-    public void setRegistryValue(String registryValue) {
-        this.registryValue = registryValue;
+    public void setRegistryPort(String registryPort) {
+        this.registryPort = registryPort;
     }
 
     @Override
     public String toString() {
         return "RegistryParam{" +
-                "registGroup='" + registGroup + '\'' +
-                ", registryKey='" + registryKey + '\'' +
-                ", registryValue='" + registryValue + '\'' +
+                "registName='" + registName + '\'' +
+                ", registryIp='" + registryIp + '\'' +
+                ", registryPort='" + registryPort + '\'' +
                 ", jobHandleInfos=" + jobHandleInfos +
                 ", jobs=" + Arrays.toString(jobs) +
                 '}';

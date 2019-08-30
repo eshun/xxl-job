@@ -157,21 +157,6 @@ CREATE TABLE `xxl_job_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for xxl_job_logglue
--- ----------------------------
-DROP TABLE IF EXISTS `xxl_job_logglue`;
-CREATE TABLE `xxl_job_logglue` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `job_id` int(11) NOT NULL COMMENT '任务，主键ID',
-  `glue_type` varchar(50) DEFAULT NULL COMMENT 'GLUE类型',
-  `glue_source` mediumtext COMMENT 'GLUE源代码',
-  `glue_remark` varchar(128) NOT NULL COMMENT 'GLUE备注',
-  `add_time` timestamp NULL DEFAULT NULL,
-  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
 -- Table structure for xxl_job_registry
 -- ----------------------------
 DROP TABLE IF EXISTS `xxl_job_registry`;

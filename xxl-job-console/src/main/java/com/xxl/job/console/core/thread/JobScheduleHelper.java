@@ -61,7 +61,7 @@ public class JobScheduleHelper {
                     boolean preReadSuc = true;
                     try {
 
-                        conn = XxlJobConsoleConfig.getAdminConfig().getDataSource().getConnection();
+                        conn = XxlJobConsoleConfig.getConsoleConfig().getDataSource().getConnection();
                         connAutoCommit = conn.getAutoCommit();
                         conn.setAutoCommit(false);
 
@@ -72,7 +72,7 @@ public class JobScheduleHelper {
 
                         // 1、pre read
                         long nowTime = System.currentTimeMillis();
-                        List<XxlJobInfo> scheduleList = XxlJobConsoleConfig.getAdminConfig().getXxlJobInfoDao().scheduleJobQuery(nowTime + PRE_READ_MS);
+                        List<XxlJobInfo> scheduleList = XxlJobConsoleConfig.getConsoleConfig().getXxlJobInfoDao().scheduleJobQuery(nowTime + PRE_READ_MS);
                         if (scheduleList!=null && scheduleList.size()>0) {
                             // 2、push time-ring
                             for (XxlJobInfo jobInfo: scheduleList) {
@@ -155,7 +155,7 @@ public class JobScheduleHelper {
 
                             // 3、update trigger info
                             for (XxlJobInfo jobInfo: scheduleList) {
-                                XxlJobConsoleConfig.getAdminConfig().getXxlJobInfoDao().scheduleUpdate(jobInfo);
+                                XxlJobConsoleConfig.getConsoleConfig().getXxlJobInfoDao().scheduleUpdate(jobInfo);
                             }
 
                         } else {

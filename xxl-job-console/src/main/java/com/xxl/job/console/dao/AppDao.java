@@ -26,7 +26,7 @@ public interface AppDao {
      * @author esun
      * @date 2019/08/26
      **/
-    int delete(@Param("id") int id);
+    int delete(@Param("id") Long id);
 
     /**
      * [更新]
@@ -36,11 +36,27 @@ public interface AppDao {
     int update(App app);
 
     /**
+     * 超时下线
+     * @param timeout
+     * @return
+     */
+    int offline(@Param("timeout") int timeout);
+
+    /**
      * [查詢] 根據主鍵 id 查詢
      * @author esun
      * @date 2019/08/26
      **/
-    App load(@Param("id") int id);
+    App load(@Param("id") Long id);
+
+    /**
+     * 根据运用名 ip port获取
+     * @param name
+     * @param ip
+     * @param port
+     * @return
+     */
+    App loadBy(@Param("name") String name,@Param("ip") String ip,@Param("port") Integer port);
 
     /**
      * [查詢] 分頁查詢

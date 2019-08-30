@@ -36,7 +36,7 @@ import java.util.List;
  */
 @Configuration
 @EnableWebSecurity
-public class ConsoleSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * 不拦截地址
@@ -103,13 +103,13 @@ public class ConsoleSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public ConsoleAuthenticationFilter consoleAuthenticationFilter() {
-        ConsoleAuthenticationFilter consoleAuthenticationFilter=new ConsoleAuthenticationFilter();
-        consoleAuthenticationFilter.addPermitUrls(notFiltesUrls);
-        consoleAuthenticationFilter.addPermitUrls(swaggerUrls);
-        consoleAuthenticationFilter.setUserUserDetailsService(userService);
+    public AuthenticationFilter consoleAuthenticationFilter() {
+        AuthenticationFilter authenticationFilter =new AuthenticationFilter();
+        authenticationFilter.addPermitUrls(notFiltesUrls);
+        authenticationFilter.addPermitUrls(swaggerUrls);
+        authenticationFilter.setUserUserDetailsService(userService);
 
-        return consoleAuthenticationFilter;
+        return authenticationFilter;
     }
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)

@@ -18,7 +18,7 @@ public interface UserService {
      * @param userName
      * @return
      */
-    public User loadUserByUsername(String userName);
+    User loadUserByUsername(String userName);
 
     /**
      * 分页查询
