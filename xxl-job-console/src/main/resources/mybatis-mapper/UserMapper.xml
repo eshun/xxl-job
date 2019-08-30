@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.xmky.job.console.service.dao.UserDao">
+<mapper namespace="com.xxl.job.console.dao.UserDao">
 
-    <resultMap id="User" type="com.xmky.job.console.service.model.User" >
+    <resultMap id="User" type="com.xxl.job.console.model.User" >
         <result column="id" property="id" />
         <result column="user_name" property="userName" />
         <result column="password" property="password" />
@@ -33,7 +33,7 @@
         WHERE user_name = #{userName}
     </select>
 
-    <insert id="insert" parameterType="com.xmky.job.console.service.model.User" keyProperty="id">
+    <insert id="insert" parameterType="com.xxl.job.console.model.User" keyProperty="id">
         INSERT INTO XCF_JOB_USER
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test ='null != id'>
@@ -77,7 +77,7 @@
         </trim>
     </insert>
 
-    <update id="update" parameterType="com.xmky.job.console.service.model.User">
+    <update id="update" parameterType="com.xxl.job.console.model.User">
         UPDATE XCF_JOB_USER
         <set>
             <if test ='null != id'>id = #{id},</if>
