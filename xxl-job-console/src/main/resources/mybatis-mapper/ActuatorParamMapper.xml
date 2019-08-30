@@ -6,6 +6,7 @@
     <resultMap id="ResultMap" type="com.xxl.job.console.model.ActuatorParam" >
         <result column="id" property="id" />
         <result column="actuator_id" property="actuatorId" />
+        <result column="parent_id" property="parentId" />
         <result column="name" property="name" />
         <result column="value" property="value" />
         <result column="required" property="required" />
@@ -18,6 +19,7 @@
     <sql id="Base_Column_List">
                 `id`,
                 `actuator_id`,
+                `parent_id`,
                 `name`,
                 `value`,
                 `required`,
@@ -35,6 +37,9 @@
             </if>
             <if test ='null != actuatorId'>
                 `actuator_id`,
+            </if>
+            <if test ='null != parentId'>
+                `parent_id`,
             </if>
             <if test ='null != name'>
                 `name`,
@@ -65,6 +70,9 @@
             <if test ='null != actuatorId'>
                 #{actuatorId},
             </if>
+            <if test ='null != parentId'>
+                #{parentId},
+            </if>
             <if test ='null != name'>
                 #{name},
             </if>
@@ -89,26 +97,10 @@
         </trim>
     </insert>
 
-    <delete id="delete" >
+    <delete id="delete">
         DELETE FROM xxl_job_actuator_param
-        WHERE `id_` = #{id}
+        WHERE `actuator_id` = #{actuatorId}
     </delete>
 
-    <update id="update" parameterType="com.xxl.job.console.model.ActuatorParam">
-        UPDATE xxl_job_actuator_param
-        <set>
-            <if test ='null != id'>id = #{id},</if>
-            <if test ='null != actuatorId'>actuator_id = #{actuatorId},</if>
-            <if test ='null != name'>name = #{name},</if>
-            <if test ='null != value'>value = #{value},</if>
-            <if test ='null != required'>required = #{required},</if>
-            <if test ='null != className'>class_name = #{className},</if>
-            <if test ='null != defaultValue'>default_value = #{defaultValue},</if>
-            <if test ='null != paramOrder'>param_order = #{paramOrder},</if>
-            <if test ='null != paramType'>param_type = #{paramType}</if>
-        </set>
-        WHERE `id_` = #{id}
-    </update>
-    
 
 </mapper>

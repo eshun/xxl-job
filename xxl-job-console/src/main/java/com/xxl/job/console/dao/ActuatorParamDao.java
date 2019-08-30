@@ -24,12 +24,5 @@ public interface ActuatorParamDao {
      * @author esun
      * @date 2019/08/26
      **/
-    int delete(@Param("id") int id);
-
-    /**
-     * [更新]
-     * @author esun
-     * @date 2019/08/26
-     **/
-    int update(ActuatorParam actuatorParam);
+    int delete(@Param("actuatorId") Long actuatorId);
 }

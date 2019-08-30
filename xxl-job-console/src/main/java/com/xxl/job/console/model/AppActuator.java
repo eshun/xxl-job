@@ -35,7 +35,8 @@ public class AppActuator implements Serializable {
     private Integer resTimeMs;
 
     public AppActuator() {
-        this.id= SnowflakeId.getId();
+        this.id = SnowflakeId.getId();
+        this.resTimeMs = 0;
     }
 
 }

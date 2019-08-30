@@ -26,7 +26,7 @@ public interface ActuatorDao {
      * @author esun
      * @date 2019/08/26
      **/
-    int delete(@Param("id") int id);
+    int delete(@Param("id") Long id);
 
     /**
      * [更新]
@@ -36,11 +36,27 @@ public interface ActuatorDao {
     int update(Actuator actuator);
 
     /**
+     * 禁用
+     * @param appId
+     * @param ids
+     * @return
+     */
+    int disable(@Param("appId") Long appId,@Param("ids") Long[] ids);
+
+    /**
      * [查詢] 根據主鍵 id 查詢
      * @author esun
      * @date 2019/08/26
      **/
-    Actuator load(@Param("id") int id);
+    Actuator load(@Param("id") Long id);
+
+    /**
+     * 根据执行器名称肯应用获取
+     * @param name
+     * @param appId
+     * @return
+     */
+    Actuator loadByNameAndApp(@Param("name") String name,@Param("appId") Long appId);
 
     /**
      * [查詢] 分頁查詢

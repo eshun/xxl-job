@@ -27,7 +27,7 @@ CREATE TABLE `xxl_job_actuator` (
   `ROUTE_STRATEGY` varchar(200) NOT NULL DEFAULT 'FIRST' COMMENT '执行器路由策略,默认执行第一个',
   `PARAM_MD5` varchar(200) DEFAULT NULL COMMENT 'MD5',
   `RETURN_EXAMPLE` varchar(255) DEFAULT NULL,
-  `IS_STATUS` int(4) NOT NULL DEFAULT '0' COMMENT '执行器状态，0正常1失效',
+  `status` int(4) NOT NULL DEFAULT '0' COMMENT '执行器状态，0正常1失效',
   `CREATE_TIME` datetime NOT NULL DEFAULT '2019-06-01 00:00:00' COMMENT '创建时间',
   `UPDATE_TIME` datetime NOT NULL DEFAULT '2019-06-01 00:00:00' COMMENT '修改时间',
   PRIMARY KEY (`ID`)
@@ -40,6 +40,7 @@ DROP TABLE IF EXISTS `xxl_job_actuator_param`;
 CREATE TABLE `xxl_job_actuator_param` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `ACTUATOR_ID` bigint(20) NOT NULL COMMENT '执行器',
+  `parent_id` bigint(20) NOT NULL COMMENT '父级',
   `NAME` varchar(200) NOT NULL COMMENT '属性值',
   `VALUE` varchar(200) NOT NULL COMMENT '属性中文',
   `REQUIRED` int(4) NOT NULL DEFAULT '0' COMMENT '0非1必填',

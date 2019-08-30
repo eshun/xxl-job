@@ -1,5 +1,6 @@
 package com.xxl.job.console.service.impl;
 
+import com.xxl.job.console.model.Actuator;
 import com.xxl.job.console.model.App;
 import com.xxl.job.console.model.XxlJobInfo;
 import com.xxl.job.console.model.XxlJobLog;
@@ -8,9 +9,11 @@ import com.xxl.job.console.core.trigger.TriggerTypeEnum;
 import com.xxl.job.console.core.util.I18nUtil;
 import com.xxl.job.console.dao.XxlJobInfoDao;
 import com.xxl.job.console.dao.XxlJobLogDao;
+import com.xxl.job.console.service.ActuatorService;
 import com.xxl.job.console.service.AppService;
 import com.xxl.job.core.biz.ConsoleBiz;
 import com.xxl.job.core.biz.model.HandleCallbackParam;
+import com.xxl.job.core.biz.model.JobHandleInfo;
 import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.slf4j.Logger;
@@ -36,6 +39,8 @@ public class ConsoleBizImpl implements ConsoleBiz {
 
     @Resource
     AppService appService;
+    @Resource
+    ActuatorService actuatorService;
 
     @Override
     public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList) {
@@ -128,20 +133,12 @@ public class ConsoleBizImpl implements ConsoleBiz {
             String name = registryParam.getRegistName();
             String ip = registryParam.getRegistryIp();
             int port = Integer.parseInt(registryParam.getRegistryPort());
-            Integer[] jobs = registryParam.getJobs();
 
             App app = appService.loadBy(name, ip, port);
             if (app != null) {
                 app.setOnline(0);
                 app.setUpdateTime(new Date());
-                if (jobs != null && jobs.length > 0) {
-                    String jobInfoStr = null;
-                    for (Integer job : jobs) {
-                        jobInfoStr += job + ",";
-                    }
-                    jobInfoStr = jobInfoStr.substring(0, jobInfoStr.length() - 1);
-                    app.setJobInfo(jobInfoStr);
-                }
+                app.setJobInfo(getJobInfo(registryParam));
                 appService.update(app);
             } else {
                 app = new App();
@@ -149,8 +146,10 @@ public class ConsoleBizImpl implements ConsoleBiz {
                 app.setIp(ip);
                 app.setName(name);
                 app.setPort(port);
+                app.setJobInfo(getJobInfo(registryParam));
                 appService.insert(app);
             }
+            initJobHandle(app, registryParam);
         }
         return ReturnT.SUCCESS;
     }
@@ -172,7 +171,48 @@ public class ConsoleBizImpl implements ConsoleBiz {
         return ReturnT.SUCCESS;
     }
 
-    private void initExecutor(){
+    private String getJobInfo(RegistryParam registryParam){
+        Integer[] jobs = registryParam.getJobs();
+        String jobInfoStr = "";
+        if (jobs != null && jobs.length > 0) {
+            for (Integer job : jobs) {
+                jobInfoStr += job + ",";
+            }
+            jobInfoStr = jobInfoStr.substring(0, jobInfoStr.length() - 1);
+        }
+        return jobInfoStr;
+    }
+
+    private void initJobHandle(App app,RegistryParam registryParam) {
+        List<JobHandleInfo> jobHandleInfos = registryParam.getJobHandleInfos();
+
+        if (jobHandleInfos != null && !jobHandleInfos.isEmpty()) {
+            for (JobHandleInfo jobHandleInfo : jobHandleInfos) {
+                Actuator actuator = actuatorService.loadByNameAndApp(jobHandleInfo.getName(), app.getId());
+                if (actuator == null) {
+                    actuator=new Actuator();
+                    actuator.setName(jobHandleInfo.getName());
+                    actuator.setMethod(jobHandleInfo.getMethodName());
+                    actuator.setSerialVersionUid(jobHandleInfo.getSerialVersionUID());
+                    actuator.setReturnExample(jobHandleInfo.getReturnExample());
+                    actuator.setParamMd5("");
+                    actuatorService.insert(actuator,app.getId());
+
+                } else {
+                    boolean isChange=jobHandleInfo.isCover()||actuator.getSerialVersionUid() != jobHandleInfo.getSerialVersionUID();
+                    if (isChange) {
+                        actuator.setMethod(jobHandleInfo.getMethodName());
+                        actuator.setSerialVersionUid(jobHandleInfo.getSerialVersionUID());
+                        actuatorService.deleteParam(actuator.getId());
+                    }
+                    actuator.setStatus(0);
+                    actuator.setUpdateTime(new Date());
+                    actuatorService.update(actuator);
+                }
+            }
+        }
+    }
+    private  void initParam(){
 
     }
 }

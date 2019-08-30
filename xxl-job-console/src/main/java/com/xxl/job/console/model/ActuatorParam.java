@@ -29,6 +29,11 @@ public class ActuatorParam implements Serializable {
     private Long actuatorId;
 
     /**
+     * 父级
+     */
+    private Long parentId;
+
+    /**
      * 属性值
      */
     private String name;

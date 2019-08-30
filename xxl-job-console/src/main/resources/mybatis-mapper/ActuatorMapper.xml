@@ -11,7 +11,7 @@
         <result column="route_strategy" property="routeStrategy" />
         <result column="param_md5" property="paramMd5" />
         <result column="return_example" property="returnExample" />
-        <result column="is_status" property="isStatus" />
+        <result column="status" property="status" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
@@ -24,7 +24,7 @@
                 `route_strategy`,
                 `param_md5`,
                 `return_example`,
-                `is_status`,
+                `status`,
                 `create_time`,
                 `update_time`
     </sql>
@@ -53,8 +53,8 @@
             <if test ='null != returnExample'>
                 `return_example`,
             </if>
-            <if test ='null != isStatus'>
-                `is_status`,
+            <if test ='null != status'>
+                `status`,
             </if>
             <if test ='null != createTime'>
                 `create_time`,
@@ -85,8 +85,8 @@
             <if test ='null != returnExample'>
                 #{returnExample},
             </if>
-            <if test ='null != isStatus'>
-                #{isStatus},
+            <if test ='null != status'>
+                #{status},
             </if>
             <if test ='null != createTime'>
                 #{createTime},
@@ -99,7 +99,7 @@
 
     <delete id="delete" >
         DELETE FROM xxl_job_actuator
-        WHERE `id_` = #{id}
+        WHERE `id` = #{id}
     </delete>
 
     <update id="update" parameterType="com.xxl.job.console.model.Actuator">
@@ -112,18 +112,36 @@
             <if test ='null != routeStrategy'>route_strategy = #{routeStrategy},</if>
             <if test ='null != paramMd5'>param_md5 = #{paramMd5},</if>
             <if test ='null != returnExample'>return_example = #{returnExample},</if>
-            <if test ='null != isStatus'>is_status = #{isStatus},</if>
+            <if test ='null != status'>status = #{status},</if>
             <if test ='null != createTime'>create_time = #{createTime},</if>
             <if test ='null != updateTime'>update_time = #{updateTime}</if>
         </set>
         WHERE `id_` = #{id}
     </update>
 
+    <update id="disable">
+        UPDATE xxl_job_actuator
+        SET `status` = 1
+        WHERE id IN(
+        SELECT actuator_id FROM xxl_job_app_actuator
+        WHERE `app_id` = #{appId} AND
+        actuator_id NOT IN
+        <foreach collection="ids" item="item" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+        )
+    </update>
 
     <select id="load" resultMap="ResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM xxl_job_actuator
         WHERE `id_` = #{id}
+    </select>
+
+    <select id="loadByNameAndApp" resultMap="ResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM xxl_job_actuator
+        WHERE `name` = #{name} AND id IN (SELECT actuator_id FROM xxl_job_app_actuator WHERE `app_id` = #{appId})
     </select>
 
     <select id="query" resultMap="ResultMap">
