@@ -1,6 +1,5 @@
 package com.xxl.job.console.controller;
 
-import com.xxl.job.console.service.LoginService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -18,13 +17,7 @@ public class JobInfoControllerTest extends AbstractSpringMvcTest {
 
   @Before
   public void login() throws Exception {
-    MvcResult ret = mockMvc.perform(
-        post("/login")
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .param("userName", "console")
-            .param("password", "123456")
-    ).andReturn();
-    cookie = ret.getResponse().getCookie(LoginService.LOGIN_IDENTITY_KEY);
+
   }
 
   @Test

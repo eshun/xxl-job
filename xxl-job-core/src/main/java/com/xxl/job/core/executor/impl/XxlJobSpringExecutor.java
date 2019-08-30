@@ -1,7 +1,6 @@
 package com.xxl.job.core.executor.impl;
 
 import com.xxl.job.core.executor.XxlJobExecutor;
-import com.xxl.job.core.glue.GlueFactory;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import org.springframework.beans.BeansException;
@@ -22,10 +21,6 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
 
         // init JobHandler Repository
         initJobHandlerRepository(applicationContext);
-
-        // refresh GlueFactory
-        GlueFactory.refreshInstance(1);
-
 
         // super start
         super.start();

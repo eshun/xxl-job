@@ -34,7 +34,6 @@ public class XxlJobFileAppender {
 	 *
 	 */
 	private static String logBasePath = "/data/applogs/xxl-job/jobhandler";
-	private static String glueSrcPath = logBasePath.concat("/gluesource");
 	public static void initLogPath(String logPath){
 		// init
 		if (logPath!=null && logPath.trim().length()>0) {
@@ -52,13 +51,9 @@ public class XxlJobFileAppender {
 		if (!glueBaseDir.exists()) {
 			glueBaseDir.mkdirs();
 		}
-		glueSrcPath = glueBaseDir.getPath();
 	}
 	public static String getLogPath() {
 		return logBasePath;
-	}
-	public static String getGlueSrcPath() {
-		return glueSrcPath;
 	}
 
 	/**

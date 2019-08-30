@@ -43,6 +43,8 @@
 		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 		<maven-war-plugin.version>3.2.3</maven-war-plugin.version>
 		<gson.verion>2.8.5</gson.verion>
+		<springfox.swagger2.verion>2.7.0</springfox.swagger2.verion>
+		<springfox.swagger.ui.version>2.7.0</springfox.swagger.ui.version>
 	</properties>
 
 	<build>

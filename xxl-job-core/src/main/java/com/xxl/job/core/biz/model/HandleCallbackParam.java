@@ -11,10 +11,10 @@ public class HandleCallbackParam implements Serializable {
     private long logId;
     private long logDateTim;
 
-    private ReturnT<String> executeResult;
+    private Object executeResult;
 
     public HandleCallbackParam(){}
-    public HandleCallbackParam(long logId, long logDateTim, ReturnT<String> executeResult) {
+    public HandleCallbackParam(long logId, long logDateTim, Object executeResult) {
         this.logId = logId;
         this.logDateTim = logDateTim;
         this.executeResult = executeResult;
@@ -36,11 +36,11 @@ public class HandleCallbackParam implements Serializable {
         this.logDateTim = logDateTim;
     }
 
-    public ReturnT<String> getExecuteResult() {
+    public Object getExecuteResult() {
         return executeResult;
     }
 
-    public void setExecuteResult(ReturnT<String> executeResult) {
+    public void setExecuteResult(Object executeResult) {
         this.executeResult = executeResult;
     }
 

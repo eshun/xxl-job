@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxl.job.console.dao.ActuatorParamDao">
+
+    <resultMap id="ResultMap" type="com.xxl.job.console.model.ActuatorParam" >
+        <result column="id" property="id" />
+        <result column="actuator_id" property="actuatorId" />
+        <result column="name" property="name" />
+        <result column="value" property="value" />
+        <result column="required" property="required" />
+        <result column="class_name" property="className" />
+        <result column="default_value" property="defaultValue" />
+        <result column="param_order" property="paramOrder" />
+        <result column="param_type" property="paramType" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                `id`,
+                `actuator_id`,
+                `name`,
+                `value`,
+                `required`,
+                `class_name`,
+                `default_value`,
+                `param_order`,
+                `param_type`
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" parameterType="com.xxl.job.console.model.ActuatorParam">
+        INSERT INTO xxl_job_actuator_param
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test ='null != id'>
+                `id`,
+            </if>
+            <if test ='null != actuatorId'>
+                `actuator_id`,
+            </if>
+            <if test ='null != name'>
+                `name`,
+            </if>
+            <if test ='null != value'>
+                `value`,
+            </if>
+            <if test ='null != required'>
+                `required`,
+            </if>
+            <if test ='null != className'>
+                `class_name`,
+            </if>
+            <if test ='null != defaultValue'>
+                `default_value`,
+            </if>
+            <if test ='null != paramOrder'>
+                `param_order`,
+            </if>
+            <if test ='null != paramType'>
+                `param_type`
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test ='null != id'>
+                #{id},
+            </if>
+            <if test ='null != actuatorId'>
+                #{actuatorId},
+            </if>
+            <if test ='null != name'>
+                #{name},
+            </if>
+            <if test ='null != value'>
+                #{value},
+            </if>
+            <if test ='null != required'>
+                #{required},
+            </if>
+            <if test ='null != className'>
+                #{className},
+            </if>
+            <if test ='null != defaultValue'>
+                #{defaultValue},
+            </if>
+            <if test ='null != paramOrder'>
+                #{paramOrder},
+            </if>
+            <if test ='null != paramType'>
+                #{paramType}
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="delete" >
+        DELETE FROM xxl_job_actuator_param
+        WHERE `id_` = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.xxl.job.console.model.ActuatorParam">
+        UPDATE xxl_job_actuator_param
+        <set>
+            <if test ='null != id'>id = #{id},</if>
+            <if test ='null != actuatorId'>actuator_id = #{actuatorId},</if>
+            <if test ='null != name'>name = #{name},</if>
+            <if test ='null != value'>value = #{value},</if>
+            <if test ='null != required'>required = #{required},</if>
+            <if test ='null != className'>class_name = #{className},</if>
+            <if test ='null != defaultValue'>default_value = #{defaultValue},</if>
+            <if test ='null != paramOrder'>param_order = #{paramOrder},</if>
+            <if test ='null != paramType'>param_type = #{paramType}</if>
+        </set>
+        WHERE `id_` = #{id}
+    </update>
+    
+
+</mapper>

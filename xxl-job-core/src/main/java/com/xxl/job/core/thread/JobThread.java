@@ -26,19 +26,19 @@ import java.util.concurrent.*;
  * handler thread
  * @author xuxueli 2016-1-16 19:52:47
  */
-public class JobThread extends Thread{
+public class JobThread extends Thread {
 	private static Logger logger = LoggerFactory.getLogger(JobThread.class);
 
 	private int jobId;
 	private IJobHandler handler;
 	private LinkedBlockingQueue<TriggerParam> triggerQueue;
-	private Set<Long> triggerLogIdSet;		// avoid repeat trigger for the same TRIGGER_LOG_ID
+	private Set<Long> triggerLogIdSet;        // avoid repeat trigger for the same TRIGGER_LOG_ID
 
 	private volatile boolean toStop = false;
 	private String stopReason;
 
-    private boolean running = false;    // if running job
-	private int idleTimes = 0;			// idel times
+	private boolean running = false;    // if running job
+	private int idleTimes = 0;            // idel times
 
 
 	public JobThread(int jobId, IJobHandler handler) {
@@ -47,16 +47,17 @@ public class JobThread extends Thread{
 		this.triggerQueue = new LinkedBlockingQueue<TriggerParam>();
 		this.triggerLogIdSet = Collections.synchronizedSet(new HashSet<Long>());
 	}
+
 	public IJobHandler getHandler() {
 		return handler;
 	}
 
-    /**
-     * new trigger to queue
-     *
-     * @param triggerParam
-     * @return
-     */
+	/**
+	 * new trigger to queue
+	 *
+	 * @param triggerParam
+	 * @return
+	 */
 	public ReturnT<String> pushTriggerQueue(TriggerParam triggerParam) {
 		// avoid repeat
 		if (triggerLogIdSet.contains(triggerParam.getLogId())) {
@@ -66,14 +67,14 @@ public class JobThread extends Thread{
 
 		triggerLogIdSet.add(triggerParam.getLogId());
 		triggerQueue.add(triggerParam);
-        return ReturnT.SUCCESS;
+		return ReturnT.SUCCESS;
 	}
 
-    /**
-     * kill job thread
-     *
-     * @param stopReason
-     */
+	/**
+	 * kill job thread
+	 *
+	 * @param stopReason
+	 */
 	public void toStop(String stopReason) {
 		/**
 		 * Thread.interrupt只支持终止线程的阻塞状态(wait、join、sleep)，
@@ -84,35 +85,36 @@ public class JobThread extends Thread{
 		this.stopReason = stopReason;
 	}
 
-    /**
-     * is running job
-     * @return
-     */
-    public boolean isRunningOrHasQueue() {
-        return running || triggerQueue.size()>0;
-    }
+	/**
+	 * is running job
+	 *
+	 * @return
+	 */
+	public boolean isRunningOrHasQueue() {
+		return running || triggerQueue.size() > 0;
+	}
 
-    @Override
+	@Override
 	public void run() {
 
-    	// init
-    	try {
+		// init
+		try {
 			handler.init();
 		} catch (Throwable e) {
-    		logger.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 
 		// execute
-		while(!toStop){
+		while (!toStop) {
 			running = false;
 			idleTimes++;
 
-            TriggerParam triggerParam = null;
-            ReturnT<String> executeResult = null;
-            try {
+			TriggerParam triggerParam = null;
+			Object executeResult = null;
+			try {
 				// to check toStop signal, we need cycle, so wo cannot use queue.take(), instand of poll(timeout)
 				triggerParam = triggerQueue.poll(3L, TimeUnit.SECONDS);
-				if (triggerParam!=null) {
+				if (triggerParam != null) {
 					running = true;
 					idleTimes = 0;
 					triggerLogIdSet.remove(triggerParam.getLogId());
@@ -130,10 +132,10 @@ public class JobThread extends Thread{
 						Thread futureThread = null;
 						try {
 							final TriggerParam triggerParamTmp = triggerParam;
-							FutureTask<ReturnT<String>> futureTask = new FutureTask<ReturnT<String>>(new Callable<ReturnT<String>>() {
+							FutureTask<Object> futureTask = new FutureTask<Object>(new Callable<Object>() {
 								@Override
-								public ReturnT<String> call() throws Exception {
-									return handler.execute(triggerParamTmp.getExecutorParams());
+								public Object call() throws Exception {
+									return execute(handler, triggerParamTmp);
 								}
 							});
 							futureThread = new Thread(futureTask);
@@ -145,23 +147,25 @@ public class JobThread extends Thread{
 							XxlJobLogger.log("<br>----------- xxl-job job execute timeout");
 							XxlJobLogger.log(e);
 
-							executeResult = new ReturnT<String>(IJobHandler.FAIL_TIMEOUT.getCode(), "job execute timeout ");
+							executeResult = ReturnT.failTimeout("job execute timeout ");
 						} finally {
 							futureThread.interrupt();
 						}
 					} else {
 						// just execute
-						executeResult = handler.execute(triggerParam.getExecutorParams());
+						executeResult = execute(handler, triggerParam);
 					}
 
 					if (executeResult == null) {
-						executeResult = IJobHandler.FAIL;
+						executeResult = ReturnT.fail("");
 					} else {
-						executeResult.setMsg(
-								(executeResult!=null&&executeResult.getMsg()!=null&&executeResult.getMsg().length()>50000)
-										?executeResult.getMsg().substring(0, 50000).concat("...")
-										:executeResult.getMsg());
-						executeResult.setContent(null);	// limit obj size
+						ReturnT<Object> result = (ReturnT<Object>) executeResult;
+						result.setMsg(
+								(result != null && result.getMsg() != null && result.getMsg().length() > 50000)
+										? result.getMsg().substring(0, 50000).concat("...")
+										: result.getMsg());
+						result.setContent(null);
+						executeResult = result;
 					}
 					XxlJobLogger.log("<br>----------- xxl-job job execute end(finish) -----------<br>----------- ReturnT:" + executeResult);
 
@@ -182,24 +186,24 @@ public class JobThread extends Thread{
 
 				XxlJobLogger.log("<br>----------- JobThread Exception:" + errorMsg + "<br>----------- xxl-job job execute end(error) -----------");
 			} finally {
-                if(triggerParam != null) {
-                    // callback handler info
-                    if (!toStop) {
-                        // commonm
-                        TriggerCallbackThread.pushCallBack(new HandleCallbackParam(triggerParam.getLogId(), triggerParam.getLogDateTim(), executeResult));
-                    } else {
-                        // is killed
-                        ReturnT<String> stopResult = new ReturnT<String>(ReturnT.FAIL_CODE, stopReason + " [job running，killed]");
-                        TriggerCallbackThread.pushCallBack(new HandleCallbackParam(triggerParam.getLogId(), triggerParam.getLogDateTim(), stopResult));
-                    }
-                }
-            }
-        }
+				if (triggerParam != null) {
+					// callback handler info
+					if (!toStop) {
+						// commonm
+						TriggerCallbackThread.pushCallBack(new HandleCallbackParam(triggerParam.getLogId(), triggerParam.getLogDateTim(), executeResult));
+					} else {
+						// is killed
+						ReturnT<String> stopResult = new ReturnT<String>(ReturnT.FAIL_CODE, stopReason + " [job running，killed]");
+						TriggerCallbackThread.pushCallBack(new HandleCallbackParam(triggerParam.getLogId(), triggerParam.getLogDateTim(), stopResult));
+					}
+				}
+			}
+		}
 
 		// callback trigger request in queue
-		while(triggerQueue !=null && triggerQueue.size()>0){
+		while (triggerQueue != null && triggerQueue.size() > 0) {
 			TriggerParam triggerParam = triggerQueue.poll();
-			if (triggerParam!=null) {
+			if (triggerParam != null) {
 				// is killed
 				ReturnT<String> stopResult = new ReturnT<String>(ReturnT.FAIL_CODE, stopReason + " [job not executed, in the job queue, killed.]");
 				TriggerCallbackThread.pushCallBack(new HandleCallbackParam(triggerParam.getLogId(), triggerParam.getLogDateTim(), stopResult));
@@ -216,7 +220,7 @@ public class JobThread extends Thread{
 		logger.info(">>>>>>>>>>> xxl-job JobThread stoped, hashCode:{}", Thread.currentThread());
 	}
 
-	public static ReturnT<Object> invoke(IJobHandler handler,TriggerParam triggerParam) {
+	public static Object execute(IJobHandler handler, TriggerParam triggerParam) {
 		try {
 			Class<?> c = handler.getClass();
 			Method method = c.getMethod(triggerParam.getExecutorMethod());
@@ -227,16 +231,19 @@ public class JobThread extends Thread{
 			} else {
 				retObject = method.invoke(handler, null);
 			}
-
+			if (retObject == null) {
+				return ReturnT.SUCCESS;
+			} else {
+				return new ReturnT(retObject);
+			}
 		} catch (NoSuchMethodException e) {
-
+			return ReturnT.fail(e.getMessage());
 		} catch (IllegalAccessException e) {
-
+			return ReturnT.fail(e.getMessage());
 		} catch (IllegalArgumentException e) {
-
+			return ReturnT.fail(e.getMessage());
 		} catch (InvocationTargetException e) {
-
+			return ReturnT.fail(e.getMessage());
 		}
-		return  null;
 	}
 }

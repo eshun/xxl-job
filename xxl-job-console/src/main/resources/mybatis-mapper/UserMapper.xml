@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xmky.job.console.service.dao.UserDao">
+
+    <resultMap id="User" type="com.xmky.job.console.service.model.User" >
+        <result column="id" property="id" />
+        <result column="user_name" property="userName" />
+        <result column="password" property="password" />
+        <result column="enabled" property="enabled" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        user_name,
+        password,
+        enabled,
+        create_time,
+        update_time
+    </sql>
+
+    <select id="loadById" resultMap="User">
+        SELECT <include refid="Base_Column_List" />
+        FROM XCF_JOB_USER
+        WHERE id = #{id}
+    </select>
+
+    <select id="loadByUserName" resultMap="User">
+        SELECT <include refid="Base_Column_List" />
+        FROM XCF_JOB_USER
+        WHERE user_name = #{userName}
+    </select>
+
+    <insert id="insert" parameterType="com.xmky.job.console.service.model.User" keyProperty="id">
+        INSERT INTO XCF_JOB_USER
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test ='null != id'>
+                `id`,
+            </if>
+            <if test ='null != userName'>
+                `user_name`,
+            </if>
+            <if test ='null != password'>
+                `password`,
+            </if>
+            <if test ='null != enabled'>
+                `enabled`,
+            </if>
+            <if test ='null != createTime'>
+                `create_time`,
+            </if>
+            <if test ='null != updateTime'>
+                `update_time`
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test ='null != id'>
+                #{id},
+            </if>
+            <if test ='null != userName'>
+                #{userName},
+            </if>
+            <if test ='null != password'>
+                #{password},
+            </if>
+            <if test ='null != enabled'>
+                #{enabled},
+            </if>
+            <if test ='null != createTime'>
+                #{createTime},
+            </if>
+            <if test ='null != updateTime'>
+                #{updateTime}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.xmky.job.console.service.model.User">
+        UPDATE XCF_JOB_USER
+        <set>
+            <if test ='null != id'>id = #{id},</if>
+            <if test ='null != userName'>user_name = #{userName},</if>
+            <if test ='null != userPassword'>password = #{password},</if>
+            <if test ='null != userStatus'>enabled = #{enabled},</if>
+            <if test ='null != createTime'>create_time = #{createTime},</if>
+            <if test ='null != updateTime'>update_time = #{updateTime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM XCF_JOB_USER
+        WHERE id = #{id}
+    </delete>
+
+    <select id="query" resultMap="User">
+        SELECT <include refid="Base_Column_List" />
+        FROM XCF_JOB_USER
+        <trim prefix="WHERE" prefixOverrides="AND | OR" >
+            <if test="userName != null and userName != ''">
+                AND user_name LIKE "%"#{userName}"%"
+            </if>
+        </trim>
+        ORDER BY id ASC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="total" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM XCF_JOB_USER
+        <trim prefix="WHERE" prefixOverrides="AND | OR" >
+            <if test="userName != null and userName != ''">
+                AND user_name LIKE "%"#{userName}"%"
+            </if>
+        </trim>
+    </select>
+
+    <select id="queryByUserName" resultMap="User">
+        SELECT <include refid="Base_Column_List" />
+        FROM XCF_JOB_USER
+        WHERE user_name LIKE "%"#{userName}"%"
+    </select>
+</mapper>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxl.job.console.dao.ActuatorDao">
+
+    <resultMap id="ResultMap" type="com.xxl.job.console.model.Actuator" >
+        <result column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="method" property="method" />
+        <result column="serial_version_uid" property="serialVersionUid" />
+        <result column="route_strategy" property="routeStrategy" />
+        <result column="param_md5" property="paramMd5" />
+        <result column="return_example" property="returnExample" />
+        <result column="is_status" property="isStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                `id`,
+                `name`,
+                `method`,
+                `serial_version_uid`,
+                `route_strategy`,
+                `param_md5`,
+                `return_example`,
+                `is_status`,
+                `create_time`,
+                `update_time`
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" parameterType="com.xxl.job.console.model.Actuator">
+        INSERT INTO xxl_job_actuator
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test ='null != id'>
+                `id`,
+            </if>
+            <if test ='null != name'>
+                `name`,
+            </if>
+            <if test ='null != method'>
+                `method`,
+            </if>
+            <if test ='null != serialVersionUid'>
+                `serial_version_uid`,
+            </if>
+            <if test ='null != routeStrategy'>
+                `route_strategy`,
+            </if>
+            <if test ='null != paramMd5'>
+                `param_md5`,
+            </if>
+            <if test ='null != returnExample'>
+                `return_example`,
+            </if>
+            <if test ='null != isStatus'>
+                `is_status`,
+            </if>
+            <if test ='null != createTime'>
+                `create_time`,
+            </if>
+            <if test ='null != updateTime'>
+                `update_time`
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test ='null != id'>
+                #{id},
+            </if>
+            <if test ='null != name'>
+                #{name},
+            </if>
+            <if test ='null != method'>
+                #{method},
+            </if>
+            <if test ='null != serialVersionUid'>
+                #{serialVersionUid},
+            </if>
+            <if test ='null != routeStrategy'>
+                #{routeStrategy},
+            </if>
+            <if test ='null != paramMd5'>
+                #{paramMd5},
+            </if>
+            <if test ='null != returnExample'>
+                #{returnExample},
+            </if>
+            <if test ='null != isStatus'>
+                #{isStatus},
+            </if>
+            <if test ='null != createTime'>
+                #{createTime},
+            </if>
+            <if test ='null != updateTime'>
+                #{updateTime}
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="delete" >
+        DELETE FROM xxl_job_actuator
+        WHERE `id_` = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.xxl.job.console.model.Actuator">
+        UPDATE xxl_job_actuator
+        <set>
+            <if test ='null != id'>id = #{id},</if>
+            <if test ='null != name'>name = #{name},</if>
+            <if test ='null != method'>method = #{method},</if>
+            <if test ='null != serialVersionUid'>serial_version_uid = #{serialVersionUid},</if>
+            <if test ='null != routeStrategy'>route_strategy = #{routeStrategy},</if>
+            <if test ='null != paramMd5'>param_md5 = #{paramMd5},</if>
+            <if test ='null != returnExample'>return_example = #{returnExample},</if>
+            <if test ='null != isStatus'>is_status = #{isStatus},</if>
+            <if test ='null != createTime'>create_time = #{createTime},</if>
+            <if test ='null != updateTime'>update_time = #{updateTime}</if>
+        </set>
+        WHERE `id_` = #{id}
+    </update>
+
+
+    <select id="load" resultMap="ResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM xxl_job_actuator
+        WHERE `id_` = #{id}
+    </select>
+
+    <select id="query" resultMap="ResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM xxl_job_actuator
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM xxl_job_actuator
+    </select>
+
+</mapper>

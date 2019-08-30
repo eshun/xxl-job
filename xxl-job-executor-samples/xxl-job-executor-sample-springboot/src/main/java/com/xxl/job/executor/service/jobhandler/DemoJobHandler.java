@@ -1,7 +1,5 @@
 package com.xxl.job.executor.service.jobhandler;
 
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.Execute;
 import com.xxl.job.core.handler.annotation.JobHandler;
@@ -10,9 +8,6 @@ import com.xxl.job.core.log.XxlJobLogger;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -37,19 +32,14 @@ public class DemoJobHandler extends IJobHandler {
 	 */
 	@Order
 	@Execute
-	public ReturnT<String> stat(@Param("测试") String param,@Param("测试") String[] params) {
-		return null;
-	}
-
-	@Override
-	public ReturnT<String> execute(String param) throws Exception {
+	public String stat(@Param("测试") String param,@Param("测试") String[] params) throws InterruptedException {
 		XxlJobLogger.log("XXL-JOB, Hello World.");
 
 		for (int i = 0; i < 5; i++) {
 			XxlJobLogger.log("beat at:" + i);
 			TimeUnit.SECONDS.sleep(2);
 		}
-		return SUCCESS;
+		return "ok";
 	}
 
 }

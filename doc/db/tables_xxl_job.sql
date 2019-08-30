@@ -198,3 +198,14 @@ CREATE TABLE `xxl_job_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `i_username` (`username`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE XXL_JOB_USER
+(
+    ID            bigint(20)   NOT NULL AUTO_INCREMENT COMMENT '主键',
+    USER_NAME     varchar(200) NOT NULL COMMENT '用户',
+    PASSWORD varchar(200) NOT NULL COMMENT '密码',
+    enabled   int(1)       NOT NULL DEFAULT 1 COMMENT '状态0正常1锁定',
+    CREATE_TIME   datetime     NOT NULL DEFAULT '2019-06-01 00:00:00' COMMENT '创建时间',
+    UPDATE_TIME   datetime     NOT NULL DEFAULT '2019-06-01 00:00:00' COMMENT '修改时间',
+    PRIMARY KEY (ID)
+);

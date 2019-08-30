@@ -1,7 +1,7 @@
 package com.xxl.job.executor.service.jobhandler;
 
-import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.Execute;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import com.xxl.job.core.util.ShardingUtil;
@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ShardingJobHandler extends IJobHandler {
 
-	@Override
-	public ReturnT<String> execute(String param) throws Exception {
+	@Execute
+	public boolean execute(String param) throws Exception {
 
 		// 分片参数
 		ShardingUtil.ShardingVO shardingVO = ShardingUtil.getShardingVo();
@@ -32,7 +32,7 @@ public class ShardingJobHandler extends IJobHandler {
 			}
 		}
 
-		return SUCCESS;
+		return true;
 	}
 
 }

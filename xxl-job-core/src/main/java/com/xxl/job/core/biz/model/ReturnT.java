@@ -14,9 +14,10 @@ public class ReturnT<T> implements Serializable {
 
 	public static final int SUCCESS_CODE = 200;
 	public static final int FAIL_CODE = 500;
+	public static final int FAIL_TIMEOUT_CODE = 502;
 
+	/** success */
 	public static final ReturnT<String> SUCCESS = new ReturnT<String>(null);
-	public static final ReturnT<String> FAIL = new ReturnT<String>(FAIL_CODE, null);
 
 	@Param("code")
 	private int code;
@@ -28,6 +29,11 @@ public class ReturnT<T> implements Serializable {
 		this.code = code;
 		this.msg = msg;
 	}
+
+	/**
+	 * success
+	 * @param content
+	 */
 	public ReturnT(T content) {
 		this.code = SUCCESS_CODE;
 		this.content = content;
@@ -50,6 +56,24 @@ public class ReturnT<T> implements Serializable {
 	}
 	public void setContent(T content) {
 		this.content = content;
+	}
+
+	/**
+	 * fail
+	 * @param msg
+	 * @return
+	 */
+	public static ReturnT<String> fail(String msg){
+		return new ReturnT<String>(FAIL_CODE, msg);
+	}
+
+	/**
+	 * fail timeout
+	 * @param msg
+	 * @return
+	 */
+	public static ReturnT<String> failTimeout(String msg){
+		return new ReturnT<String>(FAIL_TIMEOUT_CODE, msg);
 	}
 
 	@Override
