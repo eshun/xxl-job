@@ -1,6 +1,7 @@
 package com.xxl.job.console.core.route.strategy;
 
 import com.xxl.job.console.core.route.ExecutorRouter;
+import com.xxl.job.console.model.App;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
 
@@ -15,9 +16,10 @@ public class ExecutorRouteRandom extends ExecutorRouter {
     private static Random localRandom = new Random();
 
     @Override
-    public ReturnT<String> route(TriggerParam triggerParam, List<String> addressList) {
-        String address = addressList.get(localRandom.nextInt(addressList.size()));
-        return new ReturnT<String>(address);
+    public ReturnT<App> route(TriggerParam triggerParam, List<App> apps) {
+
+        App app = apps.get(localRandom.nextInt(apps.size()));
+        return new ReturnT<App>(app);
     }
 
 }

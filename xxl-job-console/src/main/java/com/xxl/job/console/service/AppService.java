@@ -72,4 +72,11 @@ public interface AppService {
      * @return
      */
     int count(int offset, int pageSize);
+
+    /**
+     * 根据执行器获取在线应用
+     * @param actuatorId
+     * @return
+     */
+    List<App> queryByActuatorId(Long actuatorId);
 }

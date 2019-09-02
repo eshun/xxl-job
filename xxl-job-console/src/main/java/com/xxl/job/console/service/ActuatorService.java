@@ -59,6 +59,13 @@ public interface ActuatorService {
     int deleteParam(Long actuatorId);
 
     /**
+     * 获取一条数据
+     * @param id
+     * @return
+     */
+    Actuator load(Long id);
+
+    /**
      * 根据执行器名称肯应用获取
      * @param name
      * @param appId

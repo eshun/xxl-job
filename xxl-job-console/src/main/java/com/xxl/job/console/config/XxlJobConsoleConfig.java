@@ -1,7 +1,7 @@
 package com.xxl.job.console.config;
 
-import com.xxl.job.console.dao.XxlJobInfoDao;
-import com.xxl.job.console.dao.XxlJobLogDao;
+import com.xxl.job.console.dao.JobInfoDao;
+import com.xxl.job.console.dao.JobLogDao;
 import com.xxl.job.console.service.ActuatorService;
 import com.xxl.job.console.service.AppService;
 import com.xxl.job.core.biz.ConsoleBiz;
@@ -56,9 +56,9 @@ public class XxlJobConsoleConfig implements InitializingBean{
 
     // dao, service
     @Resource
-    private XxlJobLogDao xxlJobLogDao;
+    private JobLogDao jobLogDao;
     @Resource
-    private XxlJobInfoDao xxlJobInfoDao;
+    private JobInfoDao jobInfoDao;
     @Resource
     private ConsoleBiz consoleBiz;
     @Resource
@@ -91,12 +91,12 @@ public class XxlJobConsoleConfig implements InitializingBean{
         return initUser;
     }
 
-    public XxlJobLogDao getXxlJobLogDao() {
-        return xxlJobLogDao;
+    public JobLogDao getJobLogDao() {
+        return jobLogDao;
     }
 
-    public XxlJobInfoDao getXxlJobInfoDao() {
-        return xxlJobInfoDao;
+    public JobInfoDao getJobInfoDao() {
+        return jobInfoDao;
     }
 
     public ConsoleBiz getConsoleBiz() {

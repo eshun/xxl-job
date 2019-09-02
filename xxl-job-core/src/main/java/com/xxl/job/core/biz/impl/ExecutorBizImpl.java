@@ -26,7 +26,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
     }
 
     @Override
-    public ReturnT<String> idleBeat(int jobId) {
+    public ReturnT<String> idleBeat(long jobId) {
 
         // isRunningOrHasQueue
         boolean isRunningOrHasQueue = false;
@@ -42,7 +42,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
     }
 
     @Override
-    public ReturnT<String> kill(int jobId) {
+    public ReturnT<String> kill(long jobId) {
         // kill handlerThread, and create new one
         JobThread jobThread = XxlJobExecutor.loadJobThread(jobId);
         if (jobThread != null) {

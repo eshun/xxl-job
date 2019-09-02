@@ -135,7 +135,7 @@
     <select id="load" resultMap="ResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM xxl_job_actuator
-        WHERE `id_` = #{id}
+        WHERE `id` = #{id}
     </select>
 
     <select id="loadByNameAndApp" resultMap="ResultMap">
@@ -154,5 +154,4 @@
         SELECT count(1)
         FROM xxl_job_actuator
     </select>
-
 </mapper>

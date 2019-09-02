@@ -1,6 +1,7 @@
 package com.xxl.job.console.core.route.strategy;
 
 import com.xxl.job.console.core.route.ExecutorRouter;
+import com.xxl.job.console.model.App;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
 
@@ -14,9 +15,9 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class ExecutorRouteRound extends ExecutorRouter {
 
-    private static ConcurrentMap<Integer, Integer> routeCountEachJob = new ConcurrentHashMap<Integer, Integer>();
+    private static ConcurrentMap<Long, Integer> routeCountEachJob = new ConcurrentHashMap<Long, Integer>();
     private static long CACHE_VALID_TIME = 0;
-    private static int count(int jobId) {
+    private static int count(long jobId) {
         // cache clear
         if (System.currentTimeMillis() > CACHE_VALID_TIME) {
             routeCountEachJob.clear();
@@ -31,9 +32,9 @@ public class ExecutorRouteRound extends ExecutorRouter {
     }
 
     @Override
-    public ReturnT<String> route(TriggerParam triggerParam, List<String> addressList) {
-        String address = addressList.get(count(triggerParam.getJobId())%addressList.size());
-        return new ReturnT<String>(address);
+    public ReturnT<App> route(TriggerParam triggerParam, List<App> apps) {
+        App app = apps.get(count(triggerParam.getJobId())%apps.size());
+        return new ReturnT<App>(app);
     }
 
 }

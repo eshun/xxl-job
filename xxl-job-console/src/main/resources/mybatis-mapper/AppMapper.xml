@@ -130,4 +130,9 @@
         FROM xxl_job_app
     </select>
 
+    <select id="queryByActuatorId" resultMap="ResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM xxl_job_app
+        WHERE `app_online` = 0 AND `id` IN (SELECT app_id FROM xxl_job_app_actuator WHERE `actuator_id` = #{actuatorId})
+    </select>
 </mapper>

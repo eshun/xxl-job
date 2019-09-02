@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.xxl.job.console.dao.XxlJobLogDao">
+<mapper namespace="com.xxl.job.console.dao.JobLogDao">
 	
-	<resultMap id="XxlJobLog" type="com.xxl.job.console.model.XxlJobLog" >
+	<resultMap id="XxlJobLog" type="com.xxl.job.console.model.JobLog" >
 		<result column="id" property="id" />
 
-		<result column="job_group" property="jobGroup" />
 		<result column="job_id" property="jobId" />
+		<result column="actuator_id" property="actuatorId" />
+		<result column="app_id" property="appId" />
 
 		<result column="executor_address" property="executorAddress" />
 		<result column="executor_handler" property="executorHandler" />
@@ -28,8 +29,9 @@
 
 	<sql id="Base_Column_List">
 		t.id,
-		t.job_group,
 		t.job_id,
+		t.actuator_id,
+		t.app_id,
 		t.executor_address,
 		t.executor_handler,
 		t.executor_param,
@@ -48,11 +50,14 @@
 		SELECT <include refid="Base_Column_List" />
 		FROM xxl_job_log AS t
 		<trim prefix="WHERE" prefixOverrides="AND | OR" >
-			<if test="jobId==0 and jobGroup gt 0">
-				AND t.job_group = #{jobGroup}
-			</if>
 			<if test="jobId gt 0">
 				AND t.job_id = #{jobId}
+			</if>
+			<if test="appId gt 0">
+				AND t.app_id = #{appId}
+			</if>
+			<if test="actuatorId gt 0">
+				AND t.actuator_id = #{actuatorId}
 			</if>
 			<if test="triggerTimeStart != null">
 				AND t.trigger_time <![CDATA[ >= ]]> #{triggerTimeStart}
@@ -75,18 +80,21 @@
 			</if>
 		</trim>
 		ORDER BY t.trigger_time DESC
-		LIMIT #{offset}, #{pagesize}
+		LIMIT #{offset}, #{pageSize}
 	</select>
 	
 	<select id="pageListCount" resultType="int">
 		SELECT count(1)
 		FROM xxl_job_log AS t
 		<trim prefix="WHERE" prefixOverrides="AND | OR" >
-			<if test="jobId==0 and jobGroup gt 0">
-				AND t.job_group = #{jobGroup}
-			</if>
 			<if test="jobId gt 0">
 				AND t.job_id = #{jobId}
+			</if>
+			<if test="appId gt 0">
+				AND t.app_id = #{appId}
+			</if>
+			<if test="actuatorId gt 0">
+				AND t.actuator_id = #{actuatorId}
 			</if>
 			<if test="triggerTimeStart != null">
 				AND t.trigger_time <![CDATA[ >= ]]> #{triggerTimeStart}
@@ -116,24 +124,24 @@
 		WHERE t.id = #{id}
 	</select>
 
-	
-	<insert id="save" parameterType="com.xxl.job.console.model.XxlJobLog" useGeneratedKeys="true" keyProperty="id" >
-		INSERT INTO xxl_job_log (
-			`job_group`,
+	<insert id="save" parameterType="com.xxl.job.console.model.JobLog" useGeneratedKeys="true" keyProperty="id" >
+			INSERT INTO xxl_job_log (
+			`id`,
 			`job_id`,
+			`actuator_id`,
+			`app_id`,
 			`trigger_time`,
 			`trigger_code`,
 			`handle_code`
 		) VALUES (
-			#{jobGroup},
+			#{id},
 			#{jobId},
+			#{actuatorId},
+			#{appId},
 			#{triggerTime},
 			#{triggerCode},
 			#{handleCode}
 		);
-		<!--<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() 
-		</selectKey>-->
 	</insert>
 
 	<update id="updateTriggerInfo" >
@@ -189,11 +197,14 @@
 	<delete id="clearLog" >
 		delete from xxl_job_log
 		<trim prefix="WHERE" prefixOverrides="AND | OR" >
-			<if test="jobGroup gt 0">
-				AND job_group = #{jobGroup}
-			</if>
 			<if test="jobId gt 0">
 				AND job_id = #{jobId}
+			</if>
+			<if test="appId gt 0">
+				AND app_id = #{appId}
+			</if>
+			<if test="actuatorId gt 0">
+				AND actuator_id = #{actuatorId}
 			</if>
 			<if test="clearBeforeTime != null">
 				AND trigger_time <![CDATA[ <= ]]> #{clearBeforeTime}
@@ -203,11 +214,14 @@
 					SELECT id FROM(
 						SELECT id FROM xxl_job_log AS t
 						<trim prefix="WHERE" prefixOverrides="AND | OR" >
-							<if test="jobGroup gt 0">
-								AND t.job_group = #{jobGroup}
-							</if>
 							<if test="jobId gt 0">
 								AND t.job_id = #{jobId}
+							</if>
+							<if test="appId gt 0">
+								AND app_id = #{appId}
+							</if>
+							<if test="actuatorId gt 0">
+								AND actuator_id = #{actuatorId}
 							</if>
 						</trim>
 						ORDER BY t.trigger_time desc

@@ -109,6 +109,16 @@ public class ActuatorServiceImpl implements ActuatorService {
     }
 
     @Override
+    public Actuator load(Long id) {
+        try{
+            return actuatorDao.load(id);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
     public Actuator loadByNameAndApp(String name, Long appId) {
         try{
             return actuatorDao.loadByNameAndApp(name,appId);

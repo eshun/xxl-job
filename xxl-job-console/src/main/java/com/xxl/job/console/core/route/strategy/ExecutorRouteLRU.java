@@ -1,6 +1,7 @@
 package com.xxl.job.console.core.route.strategy;
 
 import com.xxl.job.console.core.route.ExecutorRouter;
+import com.xxl.job.console.model.App;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
 
@@ -19,10 +20,10 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class ExecutorRouteLRU extends ExecutorRouter {
 
-    private static ConcurrentMap<Integer, LinkedHashMap<String, String>> jobLRUMap = new ConcurrentHashMap<Integer, LinkedHashMap<String, String>>();
+    private static ConcurrentMap<Long, LinkedHashMap<Long, App>> jobLRUMap = new ConcurrentHashMap<Long, LinkedHashMap<Long, App>>();
     private static long CACHE_VALID_TIME = 0;
 
-    public String route(int jobId, List<String> addressList) {
+    public App route(long jobId, List<App> apps) {
 
         // cache clear
         if (System.currentTimeMillis() > CACHE_VALID_TIME) {
@@ -31,46 +32,48 @@ public class ExecutorRouteLRU extends ExecutorRouter {
         }
 
         // init lru
-        LinkedHashMap<String, String> lruItem = jobLRUMap.get(jobId);
+        LinkedHashMap<Long, App> lruItem = jobLRUMap.get(jobId);
         if (lruItem == null) {
             /**
              * LinkedHashMap
              *      a、accessOrder：ture=访问顺序排序（get/put时排序）；false=插入顺序排期；
              *      b、removeEldestEntry：新增元素时将会调用，返回true时会删除最老元素；可封装LinkedHashMap并重写该方法，比如定义最大容量，超出是返回true即可实现固定长度的LRU算法；
              */
-            lruItem = new LinkedHashMap<String, String>(16, 0.75f, true);
+            lruItem = new LinkedHashMap<Long, App>(16, 0.75f, true);
             jobLRUMap.putIfAbsent(jobId, lruItem);
         }
 
         // put new
-        for (String address: addressList) {
-            if (!lruItem.containsKey(address)) {
-                lruItem.put(address, address);
+        for(App app: apps){
+            if (!lruItem.containsKey(app.getId())) {
+                lruItem.put(app.getId(), app);
             }
         }
         // remove old
-        List<String> delKeys = new ArrayList<>();
-        for (String existKey: lruItem.keySet()) {
-            if (!addressList.contains(existKey)) {
-                delKeys.add(existKey);
+        List<App> delKeys = new ArrayList<>();
+        for (Long existKey: lruItem.keySet()) {
+            for(App app: apps){
+                if (!app.getId().equals(existKey)) {
+                    delKeys.add(app);
+                }
             }
         }
         if (delKeys.size() > 0) {
-            for (String delKey: delKeys) {
+            for (App delKey: delKeys) {
                 lruItem.remove(delKey);
             }
         }
 
         // load
-        String eldestKey = lruItem.entrySet().iterator().next().getKey();
-        String eldestValue = lruItem.get(eldestKey);
+        long eldestKey = lruItem.entrySet().iterator().next().getKey();
+        App eldestValue = lruItem.get(eldestKey);
         return eldestValue;
     }
 
     @Override
-    public ReturnT<String> route(TriggerParam triggerParam, List<String> addressList) {
-        String address = route(triggerParam.getJobId(), addressList);
-        return new ReturnT<String>(address);
+    public ReturnT<App> route(TriggerParam triggerParam, List<App> apps) {
+        App app = route(triggerParam.getJobId(), apps);
+        return new ReturnT<App>(app);
     }
 
 }

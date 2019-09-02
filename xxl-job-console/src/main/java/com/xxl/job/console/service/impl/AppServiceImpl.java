@@ -112,4 +112,14 @@ public class AppServiceImpl implements AppService {
             return 0;
         }
     }
+
+    @Override
+    public List<App> queryByActuatorId(Long actuatorId) {
+        try {
+            return appDao.queryByActuatorId(actuatorId);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return null;
+        }
+    }
 }

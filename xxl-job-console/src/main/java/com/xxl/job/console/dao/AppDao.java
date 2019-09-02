@@ -73,4 +73,11 @@ public interface AppDao {
      **/
     int count(@Param("offset") int offset,
                       @Param("pageSize") int pageSize);
+
+    /**
+     *
+     * @param actuatorId
+     * @return
+     */
+    List<App> queryByActuatorId(@Param("actuatorId") Long actuatorId);
 }

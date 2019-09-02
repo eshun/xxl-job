@@ -4,8 +4,8 @@ import com.xxl.job.console.model.*;
 import com.xxl.job.console.core.thread.JobTriggerPoolHelper;
 import com.xxl.job.console.core.trigger.TriggerTypeEnum;
 import com.xxl.job.console.core.util.I18nUtil;
-import com.xxl.job.console.dao.XxlJobInfoDao;
-import com.xxl.job.console.dao.XxlJobLogDao;
+import com.xxl.job.console.dao.JobInfoDao;
+import com.xxl.job.console.dao.JobLogDao;
 import com.xxl.job.console.service.ActuatorService;
 import com.xxl.job.console.service.AppService;
 import com.xxl.job.core.biz.ConsoleBiz;
@@ -30,9 +30,9 @@ public class ConsoleBizImpl implements ConsoleBiz {
     private List<ActuatorParam> actuatorParams;
 
     @Resource
-    public XxlJobLogDao xxlJobLogDao;
+    public JobLogDao jobLogDao;
     @Resource
-    private XxlJobInfoDao xxlJobInfoDao;
+    private JobInfoDao jobInfoDao;
 
     @Resource
     AppService appService;
@@ -52,7 +52,7 @@ public class ConsoleBizImpl implements ConsoleBiz {
 
     private ReturnT<String> callback(HandleCallbackParam handleCallbackParam) {
         // valid log item
-        XxlJobLog log = xxlJobLogDao.load(handleCallbackParam.getLogId());
+        JobLog log = jobLogDao.load(handleCallbackParam.getLogId());
         if (log == null) {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "log item not found.");
         }
@@ -64,11 +64,11 @@ public class ConsoleBizImpl implements ConsoleBiz {
         // trigger success, to trigger child job
         String callbackMsg = null;
         if (ReturnT.FAIL_CODE == callbackResult.getCode()) {
-            XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(log.getJobId());
-            if (xxlJobInfo!=null && xxlJobInfo.getChildJobId()!=null && xxlJobInfo.getChildJobId().trim().length()>0) {
+            JobInfo jobInfo = jobInfoDao.loadById(log.getJobId());
+            if (jobInfo !=null && jobInfo.getChildJobId()!=null && jobInfo.getChildJobId().trim().length()>0) {
                 callbackMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_child_run") +"<<<<<<<<<<< </span><br>";
 
-                String[] childJobIds = xxlJobInfo.getChildJobId().split(",");
+                String[] childJobIds = jobInfo.getChildJobId().split(",");
                 for (int i = 0; i < childJobIds.length; i++) {
                     int childJobId = (childJobIds[i]!=null && childJobIds[i].trim().length()>0 && isNumeric(childJobIds[i]))?Integer.valueOf(childJobIds[i]):-1;
                     if (childJobId > 0) {
@@ -110,7 +110,7 @@ public class ConsoleBizImpl implements ConsoleBiz {
         log.setHandleTime(new Date());
         log.setHandleCode(callbackResult.getCode());
         log.setHandleMsg(handleMsg.toString());
-        xxlJobLogDao.updateHandleInfo(log);
+        jobLogDao.updateHandleInfo(log);
 
         return ReturnT.SUCCESS;
     }

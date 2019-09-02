@@ -3,6 +3,7 @@ package com.xxl.job.console.core.route.strategy;
 import com.xxl.job.console.config.XxlJobScheduler;
 import com.xxl.job.console.core.route.ExecutorRouter;
 import com.xxl.job.console.core.util.I18nUtil;
+import com.xxl.job.console.model.App;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
@@ -15,11 +16,12 @@ import java.util.List;
 public class ExecutorRouteFailover extends ExecutorRouter {
 
     @Override
-    public ReturnT<String> route(TriggerParam triggerParam, List<String> addressList) {
+    public ReturnT<App> route(TriggerParam triggerParam, List<App> apps) {
 
         StringBuffer beatResultSB = new StringBuffer();
-        for (String address : addressList) {
+        for (App app : apps) {
             // beat
+            String address=app.getIp() + ":" + app.getPort();
             ReturnT<String> beatResult = null;
             try {
                 ExecutorBiz executorBiz = XxlJobScheduler.getExecutorBiz(address);
@@ -36,13 +38,12 @@ public class ExecutorRouteFailover extends ExecutorRouter {
 
             // beat success
             if (beatResult.getCode() == ReturnT.SUCCESS_CODE) {
-
-                beatResult.setMsg(beatResultSB.toString());
-                beatResult.setContent(address);
-                return beatResult;
+                ReturnT<App> result=new ReturnT<App>(app);
+                result.setMsg(beatResultSB.toString());
+                return result;
             }
         }
-        return new ReturnT<String>(ReturnT.FAIL_CODE, beatResultSB.toString());
+        return new ReturnT<App>(ReturnT.FAIL_CODE, beatResultSB.toString());
 
     }
 }
