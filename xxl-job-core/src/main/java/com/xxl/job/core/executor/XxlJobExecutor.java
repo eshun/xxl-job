@@ -376,7 +376,10 @@ public class XxlJobExecutor {
                     if (annotation != null) {
                         if (annotation.annotationType().equals(Param.class)) {
                             try {
-                                jobHandleParamInfo.setValue(((Param) annotation).value());
+                                Param param=(Param) annotation;
+                                jobHandleParamInfo.setValue(param.value());
+                                jobHandleParamInfo.setDefaultValue(param.defaultValue());
+                                jobHandleParamInfo.setRequired(param.required());
                             } catch (Exception e) {
 
                             }
@@ -424,6 +427,8 @@ public class XxlJobExecutor {
             Param paramAnnotation = field.getAnnotation(Param.class);
             if (paramAnnotation != null) {
                 jobHandleParamInfo.setValue(paramAnnotation.value());
+                jobHandleParamInfo.setDefaultValue(paramAnnotation.defaultValue());
+                jobHandleParamInfo.setRequired(paramAnnotation.required());
             }
         }
         if (clazz.isArray()) {
@@ -503,11 +508,15 @@ public class XxlJobExecutor {
             if (execute != null) {
                 Param param = execute.param();
                 jobHandleParamInfo.setValue(param.value());
+                jobHandleParamInfo.setDefaultValue(param.defaultValue());
+                jobHandleParamInfo.setRequired(param.required());
             }
             if (field != null) {
                 Param paramAnnotation = field.getAnnotation(Param.class);
                 if (paramAnnotation != null) {
                     jobHandleParamInfo.setValue(paramAnnotation.value());
+                    jobHandleParamInfo.setDefaultValue(paramAnnotation.defaultValue());
+                    jobHandleParamInfo.setRequired(paramAnnotation.required());
                 }
             }
         } else if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {

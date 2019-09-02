@@ -29,72 +29,14 @@
                 `param_type`
     </sql>
 
-    <insert id="insert" useGeneratedKeys="true" keyColumn="id" parameterType="com.xxl.job.console.model.ActuatorParam">
+    <insert id="insertList">
         INSERT INTO xxl_job_actuator_param
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test ='null != id'>
-                `id`,
-            </if>
-            <if test ='null != actuatorId'>
-                `actuator_id`,
-            </if>
-            <if test ='null != parentId'>
-                `parent_id`,
-            </if>
-            <if test ='null != name'>
-                `name`,
-            </if>
-            <if test ='null != value'>
-                `value`,
-            </if>
-            <if test ='null != required'>
-                `required`,
-            </if>
-            <if test ='null != className'>
-                `class_name`,
-            </if>
-            <if test ='null != defaultValue'>
-                `default_value`,
-            </if>
-            <if test ='null != paramOrder'>
-                `param_order`,
-            </if>
-            <if test ='null != paramType'>
-                `param_type`
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test ='null != id'>
-                #{id},
-            </if>
-            <if test ='null != actuatorId'>
-                #{actuatorId},
-            </if>
-            <if test ='null != parentId'>
-                #{parentId},
-            </if>
-            <if test ='null != name'>
-                #{name},
-            </if>
-            <if test ='null != value'>
-                #{value},
-            </if>
-            <if test ='null != required'>
-                #{required},
-            </if>
-            <if test ='null != className'>
-                #{className},
-            </if>
-            <if test ='null != defaultValue'>
-                #{defaultValue},
-            </if>
-            <if test ='null != paramOrder'>
-                #{paramOrder},
-            </if>
-            <if test ='null != paramType'>
-                #{paramType}
-            </if>
-        </trim>
+        (`id`,`actuator_id`,`parent_id`,`name`,`value`,`required`,`class_name`,`default_value`,`param_order`,`param_type`)
+        VALUES
+        <foreach collection="actuatorParams" item="actuatorParam" separator=",">
+        (#{actuatorParam.id},#{actuatorParam.actuatorId},#{actuatorParam.parentId},#{actuatorParam.name},#{actuatorParam.value},
+        #{actuatorParam.required},#{actuatorParam.className},#{actuatorParam.defaultValue},#{actuatorParam.paramOrder},#{actuatorParam.paramType})
+        </foreach>
     </insert>
 
     <delete id="delete">

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author esun
@@ -53,7 +54,7 @@ public class Actuator implements Serializable {
     private String paramMd5;
 
     /**
-     * return_example
+     * 返回值示例
      */
     private String returnExample;
 
@@ -71,5 +72,10 @@ public class Actuator implements Serializable {
      * 修改时间
      */
     private Date updateTime;
+
+    /**
+     * 执行器参数
+     */
+    private List<ActuatorParam> actuatorParams;
 
 }

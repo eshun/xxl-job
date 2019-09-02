@@ -1,9 +1,6 @@
 package com.xxl.job.console.service.impl;
 
-import com.xxl.job.console.model.Actuator;
-import com.xxl.job.console.model.App;
-import com.xxl.job.console.model.XxlJobInfo;
-import com.xxl.job.console.model.XxlJobLog;
+import com.xxl.job.console.model.*;
 import com.xxl.job.console.core.thread.JobTriggerPoolHelper;
 import com.xxl.job.console.core.trigger.TriggerTypeEnum;
 import com.xxl.job.console.core.util.I18nUtil;
@@ -12,16 +9,14 @@ import com.xxl.job.console.dao.XxlJobLogDao;
 import com.xxl.job.console.service.ActuatorService;
 import com.xxl.job.console.service.AppService;
 import com.xxl.job.core.biz.ConsoleBiz;
-import com.xxl.job.core.biz.model.HandleCallbackParam;
-import com.xxl.job.core.biz.model.JobHandleInfo;
-import com.xxl.job.core.biz.model.RegistryParam;
-import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.biz.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +26,8 @@ import java.util.List;
 @Service
 public class ConsoleBizImpl implements ConsoleBiz {
     private static Logger logger = LoggerFactory.getLogger(ConsoleBizImpl.class);
+
+    private List<ActuatorParam> actuatorParams;
 
     @Resource
     public XxlJobLogDao xxlJobLogDao;
@@ -149,6 +146,7 @@ public class ConsoleBizImpl implements ConsoleBiz {
                 app.setJobInfo(getJobInfo(registryParam));
                 appService.insert(app);
             }
+            actuatorParams=new ArrayList<>();
             initJobHandle(app, registryParam);
         }
         return ReturnT.SUCCESS;
@@ -190,29 +188,59 @@ public class ConsoleBizImpl implements ConsoleBiz {
             for (JobHandleInfo jobHandleInfo : jobHandleInfos) {
                 Actuator actuator = actuatorService.loadByNameAndApp(jobHandleInfo.getName(), app.getId());
                 if (actuator == null) {
-                    actuator=new Actuator();
+                    actuator = new Actuator();
                     actuator.setName(jobHandleInfo.getName());
                     actuator.setMethod(jobHandleInfo.getMethodName());
                     actuator.setSerialVersionUid(jobHandleInfo.getSerialVersionUID());
                     actuator.setReturnExample(jobHandleInfo.getReturnExample());
                     actuator.setParamMd5("");
-                    actuatorService.insert(actuator,app.getId());
+
+                    initParam(jobHandleInfo.getGenericReturn(),1,actuator.getId(),null);
+                    for (JobHandleParamInfo info : jobHandleInfo.getGenericParameters()) {
+                        initParam(info,0,actuator.getId(),null);
+                    }
+                    actuator.setActuatorParams(actuatorParams);
+
+                    actuatorService.insert(actuator, app.getId());
 
                 } else {
-                    boolean isChange=jobHandleInfo.isCover()||actuator.getSerialVersionUid() != jobHandleInfo.getSerialVersionUID();
+                    boolean isChange = jobHandleInfo.isCover() || !actuator.getSerialVersionUid().equals(jobHandleInfo.getSerialVersionUID());
                     if (isChange) {
                         actuator.setMethod(jobHandleInfo.getMethodName());
                         actuator.setSerialVersionUid(jobHandleInfo.getSerialVersionUID());
                         actuatorService.deleteParam(actuator.getId());
+
+                        initParam(jobHandleInfo.getGenericReturn(),1,actuator.getId(),null);
+                        for (JobHandleParamInfo info : jobHandleInfo.getGenericParameters()) {
+                            initParam(info,0,actuator.getId(),null);
+                        }
+                        actuator.setActuatorParams(actuatorParams);
                     }
                     actuator.setStatus(0);
                     actuator.setUpdateTime(new Date());
                     actuatorService.update(actuator);
+
                 }
             }
         }
     }
-    private  void initParam(){
 
+    private void initParam(JobHandleParamInfo info,Integer paramType,Long actuatorId,Long pid) {
+        ActuatorParam actuatorParam = new ActuatorParam();
+        actuatorParam.setActuatorId(actuatorId);
+        actuatorParam.setParentId(pid);
+        actuatorParam.setParamType(paramType);
+        actuatorParam.setClassName(info.getClassName());
+        actuatorParam.setDefaultValue(info.getDefaultValue());
+        actuatorParam.setName(info.getName());
+        actuatorParam.setValue(info.getValue());
+        actuatorParam.setParamOrder(info.getParamOrder());
+        actuatorParam.setRequired(info.isRequired());
+        actuatorParams.add(actuatorParam);
+        if (info.getChildren() != null && !info.getChildren().isEmpty()) {
+            for (JobHandleParamInfo child : info.getChildren()) {
+                initParam(child, paramType, actuatorId, actuatorParam.getId());
+            }
+        }
     }
 }

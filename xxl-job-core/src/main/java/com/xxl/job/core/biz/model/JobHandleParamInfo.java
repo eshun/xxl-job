@@ -21,6 +21,10 @@ public class JobHandleParamInfo implements Serializable {
 
     private String className;
 
+    private String defaultValue;
+
+    private boolean required;
+
     /**
      * 0入参 1出参
      */
@@ -85,12 +89,30 @@ public class JobHandleParamInfo implements Serializable {
         ParamOrder = paramOrder;
     }
 
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
+    }
+
     @Override
     public String toString() {
         return "JobHandleParamInfo{" +
                 "name='" + name + '\'' +
                 ", value='" + value + '\'' +
                 ", className='" + className + '\'' +
+                ", defaultValue='" + defaultValue + '\'' +
+                ", required=" + required +
                 ", ParamType=" + ParamType +
                 ", ParamOrder=" + ParamOrder +
                 ", children=" + children +

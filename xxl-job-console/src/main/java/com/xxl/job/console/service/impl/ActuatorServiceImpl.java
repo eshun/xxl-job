@@ -4,6 +4,7 @@ import com.xxl.job.console.dao.ActuatorDao;
 import com.xxl.job.console.dao.ActuatorParamDao;
 import com.xxl.job.console.dao.AppActuatorDao;
 import com.xxl.job.console.model.Actuator;
+import com.xxl.job.console.model.ActuatorParam;
 import com.xxl.job.console.model.AppActuator;
 import com.xxl.job.console.service.ActuatorService;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.beans.Transient;
+import java.util.List;
 
 /**
  * TODO
@@ -34,8 +36,12 @@ public class ActuatorServiceImpl implements ActuatorService {
     AppActuatorDao appActuatorDao;
 
     @Override
+    @Transient
     public int insert(Actuator actuator) {
         try{
+            if(actuator.getActuatorParams()!=null&&!actuator.getActuatorParams().isEmpty()){
+                insertParams(actuator.getActuatorParams());
+            }
             return actuatorDao.insert(actuator);
         }catch (Exception e){
             logger.error(e.getMessage());
@@ -60,8 +66,21 @@ public class ActuatorServiceImpl implements ActuatorService {
     }
 
     @Override
+    public int insertParams(List<ActuatorParam> actuatorParams){
+        try{
+            return actuatorParamDao.insertList(actuatorParams);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return 0;
+        }
+    }
+
+    @Override
     public int update(Actuator actuator) {
         try{
+            if(actuator.getActuatorParams()!=null&&!actuator.getActuatorParams().isEmpty()){
+                insertParams(actuator.getActuatorParams());
+            }
             return actuatorDao.update(actuator);
         }catch (Exception e){
             logger.error(e.getMessage());

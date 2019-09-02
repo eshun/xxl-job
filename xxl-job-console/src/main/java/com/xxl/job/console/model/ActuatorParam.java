@@ -44,9 +44,9 @@ public class ActuatorParam implements Serializable {
     private String value;
 
     /**
-     * 0非1必填
+     * 是否必填
      */
-    private Integer required;
+    private boolean required;
 
     /**
      * 属性classname

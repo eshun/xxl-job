@@ -1,6 +1,9 @@
 package com.xxl.job.console.service;
 
 import com.xxl.job.console.model.Actuator;
+import com.xxl.job.console.model.ActuatorParam;
+
+import java.util.List;
 
 /**
  * TODO
@@ -25,6 +28,13 @@ public interface ActuatorService {
      * @return
      */
     int insert(Actuator actuator,Long appId);
+
+    /**
+     * 批量新增
+     * @param actuatorParams
+     * @return
+     */
+    int insertParams(List<ActuatorParam> actuatorParams);
 
     /**
      * 更新
