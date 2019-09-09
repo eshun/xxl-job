@@ -28,5 +28,13 @@ public interface JobInfoParamDao {
      * @param jobId
      * @return
      */
-    int delete(@Param("jobId") Long jobId);
+    int delete(@Param("jobId") long jobId);
+
+    /**
+     * 获取任务参数
+     * @param jobId
+     * @param parentId
+     * @return
+     */
+    List<JobInfoParam> queryByParent(@Param("jobId") long jobId,@Param("parentId") long parentId);
 }

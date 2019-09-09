@@ -3,6 +3,7 @@ package com.xxl.job.console.service.impl;
 import com.xxl.job.console.dao.JobInfoDao;
 import com.xxl.job.console.dao.JobInfoParamDao;
 import com.xxl.job.console.model.JobInfo;
+import com.xxl.job.console.model.JobInfoParam;
 import com.xxl.job.console.service.JobInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.beans.Transient;
+import java.util.List;
 
 /**
  * TODO
@@ -63,6 +65,16 @@ public class JobInfoServiceImpl implements JobInfoService {
     public JobInfo loadById(long id) {
         try {
             return jobInfoDao.loadById(id);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<JobInfoParam> queryByParent(long jobId, long parentId) {
+        try {
+            return jobInfoParamDao.queryByParent(jobId, parentId);
         } catch (Exception e) {
             logger.error(e.getMessage());
             return null;

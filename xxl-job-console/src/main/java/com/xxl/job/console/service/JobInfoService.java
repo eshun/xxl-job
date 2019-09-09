@@ -1,6 +1,9 @@
 package com.xxl.job.console.service;
 
 import com.xxl.job.console.model.JobInfo;
+import com.xxl.job.console.model.JobInfoParam;
+
+import java.util.List;
 
 /**
  * TODO
@@ -38,4 +41,12 @@ public interface JobInfoService {
      * @return
      */
     JobInfo loadById(long id);
+
+    /**
+     * 获取任务参数
+     * @param jobId
+     * @param parentId
+     * @return
+     */
+    List<JobInfoParam> queryByParent(long jobId, long parentId);
 }

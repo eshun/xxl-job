@@ -40,4 +40,10 @@
         WHERE `job_id` = #{jobId}
     </delete>
 
+    <select id="queryByParent" resultMap="ResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM xxl_job_actuator
+        where `job_id` = #{jobId} AND `parent_id` = #{parentId}
+        ORDER BY `param_order`
+    </select>
 </mapper>
