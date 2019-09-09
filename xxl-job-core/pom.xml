@@ -11,7 +11,6 @@
 
 	<name>${project.artifactId}</name>
 	<description>A lightweight distributed task scheduling framework.</description>
-	<url>http://www.xuxueli.com/</url>
 
 	<dependencies>
 
@@ -36,7 +35,7 @@
 			<version>${commons-exec.version}</version>
 		</dependency>
 
-		<!-- spring-context -->
+		<!-- springframework -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
