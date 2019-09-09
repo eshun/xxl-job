@@ -93,7 +93,7 @@
 		</trim>
 	</select>
 
-	<insert id="save" parameterType="com.xxl.job.console.model.JobInfo" useGeneratedKeys="true" keyProperty="id" >
+	<insert id="insert" parameterType="com.xxl.job.console.model.JobInfo" useGeneratedKeys="true" keyProperty="id" >
 		INSERT INTO xxl_job_info (
 			id,
 			actuator_id,

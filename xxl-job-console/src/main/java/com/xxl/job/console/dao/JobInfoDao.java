@@ -27,7 +27,7 @@ public interface JobInfoDao {
 							 @Param("jobDesc") String jobDesc,
 							 @Param("author") String author);
 	
-	public int save(JobInfo info);
+	public int insert(JobInfo info);
 
 	public JobInfo loadById(@Param("id") long id);
 	

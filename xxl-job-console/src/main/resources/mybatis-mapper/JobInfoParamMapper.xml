@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxl.job.console.dao.JobInfoParamDao">
+
+    <resultMap id="ResultMap" type="com.xxl.job.console.model.JobInfoParam" >
+        <result column="id" property="id" />
+        <result column="job_id" property="jobId" />
+        <result column="parent_id" property="parentId" />
+        <result column="name" property="name" />
+        <result column="value" property="value" />
+        <result column="job_value" property="jobValue" />
+        <result column="class_name" property="className" />
+        <result column="param_order" property="paramOrder" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                `id`,
+                `job_id`,
+                `parent_id`,
+                `name`,
+                `value`,
+                `job_value`,
+                `class_name`,
+                `param_order`
+    </sql>
+
+    <insert id="insertList">
+        INSERT INTO xxl_job_info_param
+        (`id`,`job_id`,`parent_id`,`name`,`value`,`class_name`,`job_value`,`param_order`)
+        VALUES
+        <foreach collection="JobInfoParams" item="JobInfoParam" separator=",">
+        (#{JobInfoParam.id},#{JobInfoParam.jobId},#{JobInfoParam.parentId},#{JobInfoParam.name},#{JobInfoParam.value},
+        #{JobInfoParam.className},#{JobInfoParam.jobValue},#{JobInfoParam.paramOrder})
+        </foreach>
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM xxl_job_info_param
+        WHERE `job_id` = #{jobId}
+    </delete>
+
+</mapper>

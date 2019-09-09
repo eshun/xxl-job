@@ -3,18 +3,16 @@ package com.xxl.job.console.model;
 import com.xxl.job.console.core.util.SnowflakeId;
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
+ * TODO
+ *
  * @author esun
  * @version v1.0
- * @date: 2019/8/26
+ * @date: 2019/9/9
  */
 @Data
-public class ActuatorParam implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    public ActuatorParam() {
+public class JobInfoParam {
+    public JobInfoParam() {
         this.id = SnowflakeId.getId();
         this.parentId = 0L;
         this.paramOrder = 0;
@@ -26,9 +24,9 @@ public class ActuatorParam implements Serializable {
     private Long id;
 
     /**
-     * 执行器
+     * 任务
      */
-    private Long actuatorId;
+    private Long jobId;
 
     /**
      * 父级
@@ -46,9 +44,9 @@ public class ActuatorParam implements Serializable {
     private String value;
 
     /**
-     * 是否必填
+     * 任务值
      */
-    private boolean required;
+    private String jobValue;
 
     /**
      * 属性classname
@@ -56,17 +54,7 @@ public class ActuatorParam implements Serializable {
     private String className;
 
     /**
-     * 默认值
-     */
-    private String defaultValue;
-
-    /**
      * 排序
      */
     private Integer paramOrder;
-
-    /**
-     * 0入参 1出参
-     */
-    private Integer paramType;
 }

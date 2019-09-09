@@ -39,7 +39,7 @@ public class JobInfoDaoTest {
 		info.setExecutorBlockStrategy("setExecutorBlockStrategy");
 		info.setChildJobId("1");
 
-		int count = jobInfoDao.save(info);
+		int count = jobInfoDao.insert(info);
 
 		JobInfo info2 = jobInfoDao.loadById(info.getId());
 		info2.setJobCron("jobCron2");
