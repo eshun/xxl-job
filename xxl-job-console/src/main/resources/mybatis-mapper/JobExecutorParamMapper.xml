@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.xxl.job.console.dao.JobInfoParamDao">
+<mapper namespace="com.xxl.job.console.dao.JobExecutorParamDao">
 
-    <resultMap id="ResultMap" type="com.xxl.job.console.model.JobInfoParam" >
+    <resultMap id="ResultMap" type="com.xxl.job.console.model.JobExecutorParam" >
         <result column="id" property="id" />
-        <result column="job_id" property="jobId" />
+        <result column="log_id" property="logId" />
         <result column="parent_id" property="parentId" />
         <result column="name" property="name" />
         <result column="value" property="value" />
@@ -16,7 +16,7 @@
 
     <sql id="Base_Column_List">
                 `id`,
-                `job_id`,
+                `log_id`,
                 `parent_id`,
                 `name`,
                 `value`,
@@ -26,24 +26,24 @@
     </sql>
 
     <insert id="insertList">
-        INSERT INTO xxl_job_info_param
-        (`id`,`job_id`,`parent_id`,`name`,`value`,`class_name`,`job_value`,`param_order`)
+        INSERT INTO xxl_job_executor_param
+        (`id`,`log_id`,`parent_id`,`name`,`value`,`class_name`,`job_value`,`param_order`)
         VALUES
-        <foreach collection="JobInfoParams" item="JobInfoParam" separator=",">
-        (#{JobInfoParam.id},#{JobInfoParam.jobId},#{JobInfoParam.parentId},#{JobInfoParam.name},#{JobInfoParam.value},
-        #{JobInfoParam.className},#{JobInfoParam.jobValue},#{JobInfoParam.paramOrder})
+        <foreach collection="JobExecutorParams" item="jobExecutorParam" separator=",">
+        (#{jobExecutorParam.id},#{logId},#{jobExecutorParam.parentId},#{jobExecutorParam.name},#{jobExecutorParam.value},
+        #{jobExecutorParam.className},#{jobExecutorParam.jobValue},#{jobExecutorParam.paramOrder})
         </foreach>
     </insert>
 
     <delete id="delete">
-        DELETE FROM xxl_job_info_param
-        WHERE `job_id` = #{jobId}
+        DELETE FROM xxl_job_executor_param
+        WHERE `log_id` = #{logId}
     </delete>
 
-    <select id="queryByParent" resultMap="ResultMap">
+    <select id="queryByLogId" resultMap="ResultMap">
         SELECT <include refid="Base_Column_List" />
-        FROM xxl_job_info_param
-        where `job_id` = #{jobId} AND `parent_id` = #{parentId}
-        ORDER BY `param_order`
+        FROM xxl_job_executor_param
+        where `log_id` = #{logId}
+        ORDER BY `parent_id`,`param_order`
     </select>
 </mapper>

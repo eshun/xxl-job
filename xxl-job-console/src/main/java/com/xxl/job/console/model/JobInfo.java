@@ -4,6 +4,7 @@ import com.xxl.job.console.core.util.SnowflakeId;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * xxl-job info
@@ -30,7 +31,6 @@ public class JobInfo {
 	private String author;		// 负责人
 	private String alarmEmail;	// 报警邮件
 
-	private String executorParam;		    // 执行器，任务参数
 	private String executorBlockStrategy;	// 阻塞处理策略
 	private int executorTimeout;     		// 任务执行超时时间，单位秒
 	private int executorFailRetryCount;		// 失败重试次数
@@ -41,5 +41,7 @@ public class JobInfo {
 	private int triggerStatus;		// 调度状态：0-停止，1-运行
 	private long triggerLastTime;	// 上次调度时间
 	private long triggerNextTime;	// 下次调度时间
+
+	private List<JobInfoParam> jobInfoParams; // 执行器，任务参数
 
 }

@@ -33,7 +33,7 @@ public interface JobLogDao {
 	
 	public JobLog load(@Param("id") long id);
 
-	public long save(JobLog jobLog);
+	public int save(JobLog jobLog);
 
 	public int updateTriggerInfo(JobLog jobLog);
 

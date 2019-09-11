@@ -13,8 +13,8 @@ import java.util.List;
  * @date: 2019/9/9
  */
 @Data
-public class JobInfoParam {
-    public JobInfoParam() {
+public class JobExecutorParam {
+    public JobExecutorParam() {
         this.id = SnowflakeId.getId();
         this.parentId = 0L;
         this.paramOrder = 0;
@@ -26,9 +26,9 @@ public class JobInfoParam {
     private Long id;
 
     /**
-     * 任务
+     * 日志
      */
-    private Long jobId;
+    private Long logId;
 
     /**
      * 父级
@@ -63,5 +63,5 @@ public class JobInfoParam {
     /**
      * children
      */
-    private List<JobInfoParam> children;
+    private List<JobExecutorParam> children;
 }

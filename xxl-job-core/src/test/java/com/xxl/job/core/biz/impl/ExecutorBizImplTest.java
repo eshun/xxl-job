@@ -124,7 +124,6 @@ public class ExecutorBizImplTest {
         final TriggerParam triggerParam = new TriggerParam();
         triggerParam.setJobId(1);
         triggerParam.setExecutorHandler("demoJobHandler");
-        triggerParam.setExecutorParams(null);
         triggerParam.setExecutorBlockStrategy(ExecutorBlockStrategyEnum.COVER_EARLY.name());
         triggerParam.setLogId(1);
         triggerParam.setLogDateTim(System.currentTimeMillis());

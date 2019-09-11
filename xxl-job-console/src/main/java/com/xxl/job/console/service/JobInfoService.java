@@ -49,4 +49,15 @@ public interface JobInfoService {
      * @return
      */
     List<JobInfoParam> queryByParent(long jobId, long parentId);
+
+    /**
+     * 获取任务参数
+     * @param jobId
+     * @return
+     */
+    List<JobInfoParam> queryByParent(long jobId);
+
+    List<JobInfo> scheduleJobQuery(long maxNextTime);
+
+    int scheduleUpdate(JobInfo jobInfo);
 }

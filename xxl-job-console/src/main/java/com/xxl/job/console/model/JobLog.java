@@ -4,6 +4,7 @@ import com.xxl.job.console.core.util.SnowflakeId;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * xxl-job log, used to track trigger process
@@ -25,7 +26,6 @@ public class JobLog {
 	// execute info
 	private String executorAddress;
 	private String executorHandler;
-	private String executorParam;
 	private String executorShardingParam;
 	private int executorFailRetryCount;
 	
@@ -42,4 +42,5 @@ public class JobLog {
 	// alarm info
 	private int alarmStatus;
 
+	private List<JobExecutorParam> executorParam;
 }

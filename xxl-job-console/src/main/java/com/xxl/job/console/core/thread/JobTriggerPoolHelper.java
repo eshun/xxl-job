@@ -2,9 +2,11 @@ package com.xxl.job.console.core.thread;
 
 import com.xxl.job.console.core.trigger.TriggerTypeEnum;
 import com.xxl.job.console.core.trigger.XxlJobTrigger;
+import com.xxl.job.console.model.JobInfoParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,7 +57,7 @@ public class JobTriggerPoolHelper {
     /**
      * add trigger
      */
-    public void addTrigger(final long jobId, final TriggerTypeEnum triggerType, final int failRetryCount, final String executorShardingParam, final String executorParam) {
+    public void addTrigger(final long jobId, final TriggerTypeEnum triggerType, final int failRetryCount, final String executorShardingParam,final List<JobInfoParam> executorParams) {
 
         // choose thread pool
         ThreadPoolExecutor triggerPool_ = fastTriggerPool;
@@ -73,7 +75,7 @@ public class JobTriggerPoolHelper {
 
                 try {
                     // do trigger
-                    XxlJobTrigger.trigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParam);
+                    XxlJobTrigger.trigger(jobId, triggerType, failRetryCount, executorShardingParam,executorParams);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 } finally {
@@ -118,12 +120,10 @@ public class JobTriggerPoolHelper {
      * 			>=0: use this param
      * 			<0: use param from job info config
      * @param executorShardingParam
-     * @param executorParam
-     *          null: use job param
-     *          not null: cover job param
+     * @param executorParams //非Cron触发 可以执行参数
      */
-    public static void trigger(long jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam, String executorParam) {
-        helper.addTrigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParam);
+    public static void trigger(long jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam, List<JobInfoParam> executorParams) {
+        helper.addTrigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParams);
     }
 
     public static void toStop() {

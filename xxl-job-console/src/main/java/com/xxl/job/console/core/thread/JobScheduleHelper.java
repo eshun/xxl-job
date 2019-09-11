@@ -72,7 +72,7 @@ public class JobScheduleHelper {
 
                         // 1、pre read
                         long nowTime = System.currentTimeMillis();
-                        List<JobInfo> scheduleList = XxlJobConsoleConfig.getConsoleConfig().getJobInfoDao().scheduleJobQuery(nowTime + PRE_READ_MS);
+                        List<JobInfo> scheduleList = XxlJobConsoleConfig.getConsoleConfig().getJobInfoService().scheduleJobQuery(nowTime + PRE_READ_MS);
                         if (scheduleList!=null && scheduleList.size()>0) {
                             // 2、push time-ring
                             for (JobInfo jobInfo: scheduleList) {
@@ -99,7 +99,7 @@ public class JobScheduleHelper {
                                     long nextTime = cronExpression.getNextValidTimeAfter(new Date()).getTime();
 
                                     // 1、trigger
-                                    JobTriggerPoolHelper.trigger(jobInfo.getId(), TriggerTypeEnum.CRON, -1, null, null);
+                                    JobTriggerPoolHelper.trigger(jobInfo.getId(), TriggerTypeEnum.CRON, -1, null,null);
                                     logger.debug(">>>>>>>>>>> xxl-job, shecule push trigger : jobId = " + jobInfo.getId() );
 
                                     // 2、fresh next
@@ -155,7 +155,7 @@ public class JobScheduleHelper {
 
                             // 3、update trigger info
                             for (JobInfo jobInfo: scheduleList) {
-                                XxlJobConsoleConfig.getConsoleConfig().getJobInfoDao().scheduleUpdate(jobInfo);
+                                XxlJobConsoleConfig.getConsoleConfig().getJobInfoService().scheduleUpdate(jobInfo);
                             }
 
                         } else {
@@ -265,7 +265,7 @@ public class JobScheduleHelper {
                             // do trigger
                             for (Long jobId: ringItemData) {
                                 // do trigger
-                                JobTriggerPoolHelper.trigger(jobId, TriggerTypeEnum.CRON, -1, null, null);
+                                JobTriggerPoolHelper.trigger(jobId, TriggerTypeEnum.CRON, -1, null,null);
                             }
                             // clear
                             ringItemData.clear();

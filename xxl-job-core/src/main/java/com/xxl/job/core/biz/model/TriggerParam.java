@@ -1,6 +1,10 @@
 package com.xxl.job.core.biz.model;
 
+import com.google.gson.reflect.TypeToken;
+import com.xxl.job.core.util.GsonUtil;
+
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by xuxueli on 16/7/22.
@@ -11,7 +15,6 @@ public class TriggerParam implements Serializable{
     private long jobId;
 
     private String executorHandler;
-    private String executorParams;
     private String executorBlockStrategy;
     private int executorTimeout;
 
@@ -23,6 +26,7 @@ public class TriggerParam implements Serializable{
     private int broadcastIndex;
     private int broadcastTotal;
 
+    private List<JobHandleParamInfo> executorParams;
 
     public long getJobId() {
         return jobId;
@@ -40,12 +44,21 @@ public class TriggerParam implements Serializable{
         this.executorHandler = executorHandler;
     }
 
-    public String getExecutorParams() {
+    public List<JobHandleParamInfo> getExecutorParams() {
         return executorParams;
     }
 
-    public void setExecutorParams(String executorParams) {
+    public void setExecutorParams(List<JobHandleParamInfo> executorParams) {
         this.executorParams = executorParams;
+    }
+
+    public void setExecutorParams(String executorParams) {
+        try {
+            List<JobHandleParamInfo> jobExecutorParams = GsonUtil.fromJson(executorParams, new TypeToken<List<JobHandleParamInfo>>() {
+            }.getType());
+            this.executorParams = jobExecutorParams;
+        } catch (Exception e) {
+        }
     }
 
     public String getExecutorBlockStrategy() {

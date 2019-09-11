@@ -32,6 +32,8 @@ public class JobHandleParamInfo implements Serializable {
 
     private int ParamOrder;
 
+    private String jobValue;
+
     private List<JobHandleParamInfo> children;
 
     public List<JobHandleParamInfo> getChildren() {
@@ -105,6 +107,14 @@ public class JobHandleParamInfo implements Serializable {
         this.required = required;
     }
 
+    public String getJobValue() {
+        return jobValue;
+    }
+
+    public void setJobValue(String jobValue) {
+        this.jobValue = jobValue;
+    }
+
     @Override
     public String toString() {
         return "JobHandleParamInfo{" +
@@ -115,6 +125,7 @@ public class JobHandleParamInfo implements Serializable {
                 ", required=" + required +
                 ", ParamType=" + ParamType +
                 ", ParamOrder=" + ParamOrder +
+                ", jobValue='" + jobValue + '\'' +
                 ", children=" + children +
                 '}';
     }

@@ -35,7 +35,6 @@ public class JobInfoDaoTest {
 		info.setJobDesc("desc");
 		info.setAuthor("setAuthor");
 		info.setAlarmEmail("setAlarmEmail");
-		info.setExecutorParam("setExecutorParam");
 		info.setExecutorBlockStrategy("setExecutorBlockStrategy");
 		info.setChildJobId("1");
 
@@ -46,7 +45,6 @@ public class JobInfoDaoTest {
 		info2.setJobDesc("desc2");
 		info2.setAuthor("setAuthor2");
 		info2.setAlarmEmail("setAlarmEmail2");
-		info2.setExecutorParam("setExecutorParam2");
 		info2.setExecutorBlockStrategy("setExecutorBlockStrategy2");
 		info2.setChildJobId("1");
 

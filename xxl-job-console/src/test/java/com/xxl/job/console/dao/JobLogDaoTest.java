@@ -35,7 +35,6 @@ public class JobLogDaoTest {
         log.setTriggerMsg("1");
         log.setExecutorAddress("1");
         log.setExecutorHandler("1");
-        log.setExecutorParam("1");
         ret1 = jobLogDao.updateTriggerInfo(log);
         dto = jobLogDao.load(log.getId());
 

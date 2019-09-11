@@ -3,6 +3,7 @@ package com.xxl.job.console.core.thread;
 import com.xxl.job.console.config.XxlJobConsoleConfig;
 import com.xxl.job.console.model.Actuator;
 import com.xxl.job.console.model.JobInfo;
+import com.xxl.job.console.model.JobInfoParam;
 import com.xxl.job.console.model.JobLog;
 import com.xxl.job.console.core.trigger.TriggerTypeEnum;
 import com.xxl.job.console.core.util.I18nUtil;
@@ -46,24 +47,26 @@ public class JobFailMonitorHelper {
 				while (!toStop) {
 					try {
 
-						List<Long> failLogIds = XxlJobConsoleConfig.getConsoleConfig().getJobLogDao().findFailJobLogIds(1000);
+						List<Long> failLogIds = XxlJobConsoleConfig.getConsoleConfig().getJobLogService().findFailJobLogIds(1000);
 						if (failLogIds!=null && !failLogIds.isEmpty()) {
 							for (long failLogId: failLogIds) {
 
 								// lock log
-								int lockRet = XxlJobConsoleConfig.getConsoleConfig().getJobLogDao().updateAlarmStatus(failLogId, 0, -1);
+								int lockRet = XxlJobConsoleConfig.getConsoleConfig().getJobLogService().updateAlarmStatus(failLogId, 0, -1);
 								if (lockRet < 1) {
 									continue;
 								}
-								JobLog log = XxlJobConsoleConfig.getConsoleConfig().getJobLogDao().load(failLogId);
-								JobInfo info = XxlJobConsoleConfig.getConsoleConfig().getJobInfoDao().loadById(log.getJobId());
+								JobLog log = XxlJobConsoleConfig.getConsoleConfig().getJobLogService().load(failLogId);
+								JobInfo info = XxlJobConsoleConfig.getConsoleConfig().getJobInfoService().loadById(log.getJobId());
 
 								// 1、fail retry monitor
 								if (log.getExecutorFailRetryCount() > 0) {
-									JobTriggerPoolHelper.trigger(log.getJobId(), TriggerTypeEnum.RETRY, (log.getExecutorFailRetryCount()-1), log.getExecutorShardingParam(), null);
-									String retryMsg = "<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_type_retry") +"<<<<<<<<<<< </span><br>";
+									List<JobInfoParam> jobInfoParams = XxlJobConsoleConfig.getConsoleConfig().getJobLogService().queryExecutorParam(log.getJobId(), log.getJobId());
+									JobTriggerPoolHelper.trigger(log.getJobId(), TriggerTypeEnum.RETRY, (log.getExecutorFailRetryCount() - 1), log.getExecutorShardingParam(), jobInfoParams);
+									String retryMsg = "<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_type_retry") + "<<<<<<<<<<< </span><br>";
 									log.setTriggerMsg(log.getTriggerMsg() + retryMsg);
-									XxlJobConsoleConfig.getConsoleConfig().getJobLogDao().updateTriggerInfo(log);
+									log.setExecutorFailRetryCount(0);
+									XxlJobConsoleConfig.getConsoleConfig().getJobLogService().updateTriggerInfo(log);
 								}
 
 								// 2、fail alarm monitor
@@ -81,7 +84,7 @@ public class JobFailMonitorHelper {
 									newAlarmStatus = 1;
 								}
 
-								XxlJobConsoleConfig.getConsoleConfig().getJobLogDao().updateAlarmStatus(failLogId, -1, newAlarmStatus);
+								XxlJobConsoleConfig.getConsoleConfig().getJobLogService().updateAlarmStatus(failLogId, -1, newAlarmStatus);
 							}
 						}
 

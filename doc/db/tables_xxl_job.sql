@@ -139,7 +139,6 @@ CREATE TABLE `xxl_job_log` (
   `app_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '应用,主键ID',
   `executor_address` varchar(255) DEFAULT NULL COMMENT '执行器地址，本次执行的地址',
   `executor_handler` varchar(255) DEFAULT NULL COMMENT '执行器任务handler',
-  `executor_param` varchar(512) DEFAULT NULL COMMENT '执行器任务参数',
   `executor_sharding_param` varchar(20) DEFAULT NULL COMMENT '执行器任务分片参数，格式如 1/2',
   `executor_fail_retry_count` int(11) NOT NULL DEFAULT '0' COMMENT '失败重试次数',
   `trigger_time` datetime DEFAULT NULL COMMENT '调度-时间',
@@ -152,6 +151,22 @@ CREATE TABLE `xxl_job_log` (
   PRIMARY KEY (`id`),
   KEY `i_trigger_time` (`trigger_time`),
   KEY `i_handle_code` (`handle_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for xxl_job_executor_param
+-- ----------------------------
+DROP TABLE IF EXISTS `xxl_job_executor_param`;
+CREATE TABLE `xxl_job_executor_param` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `LOG_ID` bigint(20) NOT NULL COMMENT '任务',
+  `PARENT_ID` bigint(20) NOT NULL DEFAULT '0' COMMENT '父级',
+  `NAME` varchar(200) NOT NULL COMMENT '属性值',
+  `VALUE` varchar(200) NOT NULL DEFAULT '' COMMENT '属性中文',
+  `JOB_VALUE` varchar(200) DEFAULT '' COMMENT '任务值',
+  `CLASS_NAME` varchar(200) NOT NULL COMMENT '属性ClassName',
+  `PARAM_ORDER` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------

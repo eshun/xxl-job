@@ -2,16 +2,15 @@ package com.xxl.job.console.core.trigger;
 
 import com.xxl.job.console.config.XxlJobConsoleConfig;
 import com.xxl.job.console.config.XxlJobScheduler;
-import com.xxl.job.console.model.Actuator;
-import com.xxl.job.console.model.App;
-import com.xxl.job.console.model.JobInfo;
-import com.xxl.job.console.model.JobLog;
+import com.xxl.job.console.model.*;
 import com.xxl.job.console.core.route.ExecutorRouteStrategyEnum;
 import com.xxl.job.console.core.util.I18nUtil;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
+import com.xxl.job.core.util.GsonUtil;
+import com.xxl.job.core.util.VerifyUtil;
 import com.xxl.rpc.util.IpUtil;
 import com.xxl.rpc.util.ThrowableUtil;
 import org.slf4j.Logger;
@@ -36,13 +35,11 @@ public class XxlJobTrigger {
      * 			>=0: use this param
      * 			<0: use param from job info config
      * @param executorShardingParam
-     * @param executorParam
-     *          null: use job param
-     *          not null: cover job param
+     * @param executorParams //非Cron触发 可以执行参数
      */
-    public static void trigger(long jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam, String executorParam) {
+    public static void trigger(long jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam,List<JobInfoParam> executorParams) {
         // load data
-        JobInfo jobInfo = XxlJobConsoleConfig.getConsoleConfig().getJobInfoDao().loadById(jobId);
+        JobInfo jobInfo = XxlJobConsoleConfig.getConsoleConfig().getJobInfoService().loadById(jobId);
         if (jobInfo == null) {
             logger.warn(">>>>>>>>>>>> trigger fail, jobId invalid，jobId={}", jobId);
             return;
@@ -55,14 +52,18 @@ public class XxlJobTrigger {
         }
         List<App> apps = XxlJobConsoleConfig.getConsoleConfig().getAppService().queryByActuatorId(actuator.getId());
 
-        if (executorParam != null) {
-            jobInfo.setExecutorParam(executorParam);
+        if(executorParams!=null){
+            jobInfo.setJobInfoParams(executorParams);
+        }else{
+            List<JobInfoParam> jobInfoParams=XxlJobConsoleConfig.getConsoleConfig().getJobInfoService().queryByParent(jobInfo.getId());
+            jobInfo.setJobInfoParams(jobInfoParams);
         }
+
         // sharding param
         int[] shardingParam = null;
         if (executorShardingParam != null) {
             String[] shardingArr = executorShardingParam.split("/");
-            if (shardingArr.length == 2 && isNumeric(shardingArr[0]) && isNumeric(shardingArr[1])) {
+            if (shardingArr.length == 2 && VerifyUtil.isNumeric(shardingArr[0]) && VerifyUtil.isNumeric(shardingArr[1])) {
                 shardingParam = new int[2];
                 shardingParam[0] = Integer.valueOf(shardingArr[0]);
                 shardingParam[1] = Integer.valueOf(shardingArr[1]);
@@ -86,15 +87,6 @@ public class XxlJobTrigger {
 
     }
 
-    private static boolean isNumeric(String str){
-        try {
-            int result = Integer.valueOf(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     private static void processTrigger(Actuator actuator, List<App> apps, JobInfo jobInfo, int finalFailRetryCount, TriggerTypeEnum triggerType, int index, int total) {
 
         // param
@@ -108,14 +100,13 @@ public class XxlJobTrigger {
         jobLog.setJobId(jobInfo.getId());
         jobLog.setTriggerTime(new Date());
         jobLog.setExecutorHandler(actuator.getName());
-        XxlJobConsoleConfig.getConsoleConfig().getJobLogDao().save(jobLog);
+        XxlJobConsoleConfig.getConsoleConfig().getJobLogService().save(jobLog);
         logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());
 
         // 2、init trigger-param
         TriggerParam triggerParam = new TriggerParam();
         triggerParam.setJobId(jobInfo.getId());
         triggerParam.setExecutorHandler(actuator.getName());
-        triggerParam.setExecutorParams(jobInfo.getExecutorParam());
         triggerParam.setExecutorBlockStrategy(jobInfo.getExecutorBlockStrategy());
         triggerParam.setExecutorTimeout(jobInfo.getExecutorTimeout());
         triggerParam.setLogId(jobLog.getId());
@@ -123,6 +114,12 @@ public class XxlJobTrigger {
         triggerParam.setBroadcastIndex(index);
         triggerParam.setBroadcastTotal(total);
 
+        if(!VerifyUtil.isNullOrEmpty(jobInfo.getJobInfoParams())){
+            String json = GsonUtil.toJson(jobInfo.getJobInfoParams());
+            XxlJobConsoleConfig.getConsoleConfig().getJobLogService().insertParam(jobLog.getId(),json);
+
+            triggerParam.setExecutorParams(json);
+        }
         // 3、init address
         App app = null;
         ReturnT<App> routeAddressResult = null;
@@ -171,13 +168,12 @@ public class XxlJobTrigger {
         // 6、save log trigger-info
         jobLog.setAppId(app.getId());
         jobLog.setExecutorAddress(address);
-        jobLog.setExecutorParam(jobInfo.getExecutorParam());
         jobLog.setExecutorShardingParam(shardingParam);
         jobLog.setExecutorFailRetryCount(finalFailRetryCount);
         //jobLog.setTriggerTime();
         jobLog.setTriggerCode(triggerResult.getCode());
         jobLog.setTriggerMsg(triggerMsgSb.toString());
-        XxlJobConsoleConfig.getConsoleConfig().getJobLogDao().updateTriggerInfo(jobLog);
+        XxlJobConsoleConfig.getConsoleConfig().getJobLogService().updateTriggerInfo(jobLog);
 
         logger.debug(">>>>>>>>>>> xxl-job trigger end, jobId:{}", jobLog.getId());
     }
