@@ -14,6 +14,14 @@ import java.util.concurrent.Future;
 */
 public class ReflectionUtil {
 
+    public static Class<?> loadClassByName(String className) throws ClassNotFoundException {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            return Thread.currentThread().getContextClassLoader().loadClass(className);
+        }
+    }
+
     public static Long getSerialVersionUID(Class<?> cl) {
         try {
             ObjectStreamClass objectStreamClass = ObjectStreamClass.lookup(cl);

@@ -498,6 +498,9 @@ public class XxlJobExecutor {
         jobHandleParamInfo.setClassName(clazzName);
         if (clazz == null || clazz == void.class || clazz == Void.class) {
             return null;
+//        } else if(clazz.isEnum()){
+//            jobHandleParamInfo.setClassName("Enum");
+
         } else if (clazz.isArray()) {
             jobHandleParamInfo.setName("Array");
             jobHandleParamInfo.setClassName("Array");

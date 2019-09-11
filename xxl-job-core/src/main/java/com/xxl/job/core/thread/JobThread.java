@@ -1,13 +1,16 @@
 package com.xxl.job.core.thread;
 
 import com.xxl.job.core.biz.model.HandleCallbackParam;
+import com.xxl.job.core.biz.model.JobHandleParamInfo;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
 import com.xxl.job.core.executor.XxlJobExecutor;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.log.XxlJobFileAppender;
 import com.xxl.job.core.log.XxlJobLogger;
+import com.xxl.job.core.util.ReflectionUtil;
 import com.xxl.job.core.util.ShardingUtil;
+import com.xxl.job.core.util.VerifyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +18,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 
@@ -226,10 +226,12 @@ public class JobThread extends Thread {
 			Method method = c.getMethod(triggerParam.getExecutorMethod());
 			Class<?> clazz = method.getReturnType();
 			Object retObject = null;
+
 			if (clazz == void.class || clazz == Void.class) {
-				method.invoke(handler, null);
+				method.invoke(handler);
 			} else {
-				retObject = method.invoke(handler, null);
+				Object args=getArgs(triggerParam.getExecutorParams());
+				retObject = method.invoke(handler, args);
 			}
 			if (retObject == null) {
 				return ReturnT.SUCCESS;
@@ -245,5 +247,68 @@ public class JobThread extends Thread {
 		} catch (InvocationTargetException e) {
 			return ReturnT.fail(e.getMessage());
 		}
+	}
+
+	private static Object getArgs(List<JobHandleParamInfo> jobHandleParamInfos) {
+		if (jobHandleParamInfos != null) {
+			if (jobHandleParamInfos.size() > 1) {
+				Object[] objects = new Object[jobHandleParamInfos.size()];
+
+				return objects;
+			} else {
+				Object object = getArg(jobHandleParamInfos.get(0));
+
+				return object;
+			}
+		} else {
+			return null;
+		}
+	}
+	private static Object getArg(JobHandleParamInfo jobHandleParamInfo) {
+		String className = jobHandleParamInfo.getClassName();
+		String value = jobHandleParamInfo.getJobValue();
+
+		if (VerifyUtil.isNullOrEmpty(className)) {
+			return value;
+		} else if ("string".equals(className.toLowerCase())) {
+			return value;
+		} else if ("boolean".equals(className.toLowerCase())) {
+			return Boolean.valueOf(value);
+		} else if ("int".equals(className.toLowerCase())) {
+			return Integer.valueOf(value);
+		} else if ("byte".equals(className.toLowerCase())) {
+			return value.getBytes();
+		} else if ("double".equals(className.toLowerCase())) {
+			return Double.valueOf(value);
+		} else if ("long".equals(className.toLowerCase())) {
+			return Long.valueOf(value);
+		} else if ("float".equals(className.toLowerCase())) {
+			return Float.valueOf(value);
+		} else if ("short".equals(className.toLowerCase())) {
+			return Short.valueOf(value);
+		} else if ("Array".equals(className.toLowerCase())) {
+			List<JobHandleParamInfo> childs = jobHandleParamInfo.getChildren();
+			if (childs != null) {
+				int l = 0;
+				Object[] objects = new Object[childs.size()];
+				for (JobHandleParamInfo child : childs) {
+					objects[l] = getArg(child);
+					l++;
+				}
+				return objects;
+			}
+			return Long.valueOf(value);
+			//}else if(){//Collection Map
+
+		} else {
+			try {
+				Class<?> clazz = ReflectionUtil.loadClassByName(className);
+				//ReflectionUtil.getBeanPublicSetterMethod()
+
+			} catch (Exception e) {
+
+			}
+		}
+		return value;
 	}
 }
