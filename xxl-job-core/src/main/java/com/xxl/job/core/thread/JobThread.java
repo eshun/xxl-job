@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -228,10 +229,10 @@ public class JobThread extends Thread {
 			Object retObject = null;
 
 			if (clazz == void.class || clazz == Void.class) {
-				method.invoke(handler);
+				method.invoke(null);
 			} else {
-				Object args=getArgs(triggerParam.getExecutorParams());
-				retObject = method.invoke(handler, args);
+				Object args = getArgs(triggerParam.getExecutorParams());
+				retObject = method.invoke(args);
 			}
 			if (retObject == null) {
 				return ReturnT.SUCCESS;
@@ -266,27 +267,28 @@ public class JobThread extends Thread {
 	}
 	private static Object getArg(JobHandleParamInfo jobHandleParamInfo) {
 		String className = jobHandleParamInfo.getClassName();
+		String classNameLowerCase = className != null ? className.toLowerCase() : "";
 		String value = jobHandleParamInfo.getJobValue();
 
 		if (VerifyUtil.isNullOrEmpty(className)) {
 			return value;
-		} else if ("string".equals(className.toLowerCase())) {
+		} else if ("string".equals(classNameLowerCase)) {
 			return value;
-		} else if ("boolean".equals(className.toLowerCase())) {
+		} else if ("boolean".equals(classNameLowerCase)) {
 			return Boolean.valueOf(value);
-		} else if ("int".equals(className.toLowerCase())) {
+		} else if ("int".equals(classNameLowerCase)) {
 			return Integer.valueOf(value);
-		} else if ("byte".equals(className.toLowerCase())) {
+		} else if ("byte".equals(classNameLowerCase)) {
 			return value.getBytes();
-		} else if ("double".equals(className.toLowerCase())) {
+		} else if ("double".equals(classNameLowerCase)) {
 			return Double.valueOf(value);
-		} else if ("long".equals(className.toLowerCase())) {
+		} else if ("long".equals(classNameLowerCase)) {
 			return Long.valueOf(value);
-		} else if ("float".equals(className.toLowerCase())) {
+		} else if ("float".equals(classNameLowerCase)) {
 			return Float.valueOf(value);
-		} else if ("short".equals(className.toLowerCase())) {
+		} else if ("short".equals(classNameLowerCase)) {
 			return Short.valueOf(value);
-		} else if ("Array".equals(className.toLowerCase())) {
+		} else if ("array".equals(classNameLowerCase)) {
 			List<JobHandleParamInfo> childs = jobHandleParamInfo.getChildren();
 			if (childs != null) {
 				int l = 0;
@@ -303,6 +305,13 @@ public class JobThread extends Thread {
 		} else {
 			try {
 				Class<?> clazz = ReflectionUtil.loadClassByName(className);
+				Field[] fields = clazz.getDeclaredFields();
+				for (Field f : fields) {
+					String fieldName = f.getName();
+					Class<?> fieldClass = f.getType();
+					Method fieldMethod = ReflectionUtil.getBeanPublicSetterMethod(clazz, fieldName, fieldClass);
+					//fieldMethod.invoke()
+				}
 				//ReflectionUtil.getBeanPublicSetterMethod()
 
 			} catch (Exception e) {
